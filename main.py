@@ -10,7 +10,7 @@ _TRACE = json.loads(zlib.decompress(base64.b85decode(
 
 _SELLABLE = ("STRAWBERRY", "MELON", "MILK", "WOOL", "EGG", "TOMATO", "CARROT", "WHEAT", "FERTILIZER")
 
-_FRONT_RUN_HORIZON = 2
+_FRONT_RUN_HORIZON = 1
 _FRONT_RUN_ITEMS = ("MELON", "STRAWBERRY", "MILK", "WOOL")
 _BASE_PRICE = {"MELON": 250, "STRAWBERRY": 120, "MILK": 160, "WOOL": 200}
 _GLUT_WEIGHT = {"MELON": 3.5, "STRAWBERRY": 2.0, "MILK": 2.0, "WOOL": 3.2}
@@ -281,7 +281,7 @@ _RESERVE = {}
 # slot; market slots resolve index by index across both players.
 _SORT_SELLS = True
 # Ranking key for slot placement: "gross", "unit" or "impact".
-_SORT_KEY = 'gross'
+_SORT_KEY = 'impact'
 # True places promoted sells ahead of buys/hires; False keeps the tape's layout.
 _SELLS_FIRST = True
 # Only these products may be promoted into early slots. Empty means all.
@@ -309,7 +309,7 @@ _PROMOTE_IF_OPP_MONEY = {}
 # BUY_PRODUCT, and their buys lift the price a later slot would sell into.
 _LIFT = ()
 # Step at which to pre-empt the base's own end-of-game liquidation. 0 disables.
-_EARLY_TERMINAL = 716
+_EARLY_TERMINAL = 0
 # Force selling once the shed reaches this load, protecting end-of-day drops.
 _SHED_PRESSURE = 80
 # Reservation decays linearly to zero across this window, spreading liquidation.
