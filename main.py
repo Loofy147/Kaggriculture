@@ -276,7 +276,14 @@ _CENTER_ITEMS = tuple(k for k in _MP if k != "FERTILIZER")
 
 # Products the controller owns, mapped to a reservation price expressed as a
 # fraction of base price. Everything else keeps the tape's schedule untouched.
-_RESERVE = {}
+_RESERVE = {
+    "CARROT": 0.45,
+    "TOMATO": 0.45,
+    "MELON": 0.55,
+    "STRAWBERRY": 0.55,
+    "MILK": 0.55,
+    "WOOL": 0.55,
+}
 # Sort SELL orders by gross value so the most valuable sale takes the earliest
 # slot; market slots resolve index by index across both players.
 _SORT_SELLS = True
