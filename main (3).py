@@ -76,7 +76,7 @@ SELL_FLOOR_FRACTION = {
     "MILK": 0.55,
     "WOOL": 0.55,
 }
-CORE_SELL_ALWAYS = {"WHEAT", "EGG"}
+CORE_SELL_ALWAYS = {"EGG"}
 
 FERTILIZER_COST = 100
 MAX_MARKET_ORDERS = 10           # documented default; safe conservative cap
@@ -206,7 +206,8 @@ def _scan_farm(me, day, unlocked, half):
                 continue
             tile = tiles[y][x]
             if tile is None:
-                empty_tiles.append((x, y))
+                if (x, y) not in _shed_tiles(half):
+                    empty_tiles.append((x, y))
                 continue
             if tile == "LOCKED":
                 continue
@@ -273,12 +274,43 @@ def _pick_crop_to_plant(crop_counts, seeds, money):
 # Task assignment: give each unit (farmer + hands) one op this turn
 # --------------------------------------------------------------------------
 
-def _assign_units(units, tasks, seeds, money, opp_pressure):
-    """units: list of (unit_id, (x, y)). Returns dict unit_id -> op list
-    (farmer/hand action, e.g. ["WATER"] or ["EAST"])."""
+def _assign_units(units, tasks, private, me, opp_pressure, half, step):
     ops = {}
     claimed = set()
+    seeds = private.get("seeds", {})
     seeds_left = {k: int(v) for k, v in seeds.items()}
+    inventories = list(private.get("inventories") or [])
+    shed = dict(private.get("shed", {}))
+    money = me["money"]
+
+    # Define targets based on unlocked quadrants to avoid feed-bill bankruptcy
+    unlocked_quads = me["unlocked_quadrants"]
+    if len(unlocked_quads) >= 4:
+        PASTURE_TARGET = 7
+        COOP_TARGET = 1
+    elif len(unlocked_quads) >= 3:
+        PASTURE_TARGET = 6
+        COOP_TARGET = 1
+    elif len(unlocked_quads) >= 2:
+        PASTURE_TARGET = 3
+        COOP_TARGET = 1
+    else:
+        PASTURE_TARGET = 1
+        COOP_TARGET = 1
+
+    # Count current coops and pastures built on our farm
+    coops_count = 0
+    pastures_count = 0
+    for row in me["tiles"]:
+        for tile in row:
+            if isinstance(tile, dict):
+                if tile.get("kind") == "COOP":
+                    coops_count += 1
+                elif tile.get("kind") == "PASTURE":
+                    pastures_count += 1
+
+    can_build_coop = (step < 500) and (coops_count < COOP_TARGET) and (money >= 600 or shed.get("GOOSE", 0) > 0)
+    can_build_pasture = (step < 500) and (pastures_count < PASTURE_TARGET) and (money >= 800 or shed.get("COW", 0) > 0 or shed.get("SHEEP", 0) > 0)
 
     def claim_nearest(pos_list, unit_pos):
         avail = [p for p in pos_list if p not in claimed]
@@ -291,24 +323,46 @@ def _assign_units(units, tasks, seeds, money, opp_pressure):
     # Priority tiers, highest first: survival > cashing in > cleanup > growth > polish
     for unit_id, pos in units:
         assigned = False
+        unit_index = 0 if unit_id == "farmer" else int(unit_id.replace("hand", "")) + 1
+        unit_inventory = inventories[unit_index] if unit_index < len(inventories) else {}
 
         # 1. Feed animals / water plants that are about to die.
+        # Check animal feeding first (critical survival!)
         target = claim_nearest(tasks["animal_needs_feed"], pos)
-        if target is None:
-            target = claim_nearest(tasks["needs_water"], pos)
         if target is not None:
-            if target == pos:
-                ops[unit_id] = ["FEED"] if target in [t for t in tasks["animal_needs_feed"]] and False else None
-            # figure out which list it came from
-            if target in tasks["needs_water"] and pos == target:
-                ops[unit_id] = ["WATER"]
-                assigned = True
-            elif target == pos:
-                ops[unit_id] = ["FEED"]
+            if unit_inventory.get("WHEAT", 0) > 0:
+                if pos == (target[0], target[1]):
+                    ops[unit_id] = ["FEED"]
+                    unit_inventory["WHEAT"] -= 1
+                else:
+                    ops[unit_id] = [_step_toward(pos, (target[0], target[1]))]
                 assigned = True
             else:
+                # We need wheat to feed! Let's release the target and go pick up wheat from the shed
+                claimed.remove(target)
+                if shed.get("WHEAT", 0) > 0:
+                    shed_tiles = _shed_tiles(half)
+                    if pos in shed_tiles:
+                        pickup_qty = min(5, shed["WHEAT"])
+                        ops[unit_id] = ["PICKUP", "WHEAT", pickup_qty]
+                        shed["WHEAT"] -= pickup_qty
+                        assigned = True
+                    else:
+                        target_shed = min(shed_tiles, key=lambda s: _manhattan(pos, s))
+                        ops[unit_id] = [_step_toward(pos, target_shed)]
+                        assigned = True
+
+        if assigned:
+            continue
+
+        # Water plants
+        target = claim_nearest(tasks["needs_water"], pos)
+        if target is not None:
+            if pos == target:
+                ops[unit_id] = ["WATER"]
+            else:
                 ops[unit_id] = [_step_toward(pos, target)]
-                assigned = True
+            assigned = True
 
         if assigned:
             continue
@@ -316,15 +370,13 @@ def _assign_units(units, tasks, seeds, money, opp_pressure):
         # 2. Harvest anything ready (bank the cash), incl. animal products.
         crop_targets = [(x, y) for (x, y, _c) in tasks["harvest_ready"]]
         target = claim_nearest(crop_targets, pos)
-        harvest_kind = "crop"
         if target is None:
             target = claim_nearest(tasks["animal_ready_harvest"], pos)
-            harvest_kind = "animal"
         if target is not None:
-            if target == pos:
+            if pos == (target[0], target[1]):
                 ops[unit_id] = ["HARVEST"]
             else:
-                ops[unit_id] = [_step_toward(pos, target)]
+                ops[unit_id] = [_step_toward(pos, (target[0], target[1]))]
             assigned = True
 
         if assigned:
@@ -333,8 +385,73 @@ def _assign_units(units, tasks, seeds, money, opp_pressure):
         # 3. Clear weeds.
         target = claim_nearest(tasks["weeds"], pos)
         if target is not None:
-            ops[unit_id] = ["DIG"] if target == pos else [_step_toward(pos, target)]
+            ops[unit_id] = ["DIG"] if pos == target else [_step_toward(pos, target)]
             assigned = True
+
+        if assigned:
+            continue
+
+        # 3.5. Place animals on built empty structures if we have them in inventory or shed
+        # Check if this unit is already carrying an animal
+        carrying_animal = None
+        for anim in ("COW", "SHEEP", "GOOSE"):
+            if unit_inventory.get(anim, 0) > 0:
+                carrying_animal = anim
+                break
+
+        if carrying_animal is not None:
+            matching_kind = "COOP" if carrying_animal == "GOOSE" else "PASTURE"
+            empty_matching = [p for p in tasks["empty_structures"] if p[2] == matching_kind and p not in claimed]
+            if empty_matching:
+                target = min(empty_matching, key=lambda p: _manhattan(pos, (p[0], p[1])))
+                claimed.add(target)
+                if pos == (target[0], target[1]):
+                    ops[unit_id] = ["PLACE", carrying_animal]
+                else:
+                    ops[unit_id] = [_step_toward(pos, (target[0], target[1]))]
+                assigned = True
+
+        if assigned:
+            continue
+
+        if tasks["empty_structures"]:
+            available_animals = []
+            for p in tasks["empty_structures"]:
+                matching_animal = "GOOSE" if p[2] == "COOP" else ("COW" if shed.get("COW", 0) > 0 else ("SHEEP" if shed.get("SHEEP", 0) > 0 else None))
+                if matching_animal and shed.get(matching_animal, 0) > 0:
+                    available_animals.append((p, matching_animal))
+
+            if available_animals:
+                shed_tiles = _shed_tiles(half)
+                if pos in shed_tiles:
+                    p, matching_animal = available_animals[0]
+                    ops[unit_id] = ["PICKUP", matching_animal, 1]
+                    shed[matching_animal] -= 1
+                    assigned = True
+                else:
+                    target_shed = min(shed_tiles, key=lambda s: _manhattan(pos, s))
+                    ops[unit_id] = [_step_toward(pos, target_shed)]
+                    assigned = True
+
+        if assigned:
+            continue
+
+        # 3.6. Build structures (COOP / PASTURE)
+        if can_build_coop or can_build_pasture:
+            target = claim_nearest(tasks["empty_tiles"], pos)
+            if target is not None:
+                if pos == target:
+                    if can_build_coop:
+                        ops[unit_id] = ["BUILD_COOP"]
+                        coops_count += 1
+                        can_build_coop = (coops_count < COOP_TARGET)
+                    else:
+                        ops[unit_id] = ["BUILD_PASTURE"]
+                        pastures_count += 1
+                        can_build_pasture = (pastures_count < PASTURE_TARGET)
+                else:
+                    ops[unit_id] = [_step_toward(pos, target)]
+                assigned = True
 
         if assigned:
             continue
@@ -347,7 +464,7 @@ def _assign_units(units, tasks, seeds, money, opp_pressure):
         else:
             op_name = "CARE"
         if target is not None:
-            ops[unit_id] = [op_name] if target == pos else [_step_toward(pos, target)]
+            ops[unit_id] = [op_name] if pos == (target[0], target[1]) else [_step_toward(pos, (target[0], target[1]))]
             assigned = True
 
         if assigned:
@@ -359,7 +476,7 @@ def _assign_units(units, tasks, seeds, money, opp_pressure):
             if crop is not None:
                 target = claim_nearest(tasks["empty_tiles"], pos)
                 if target is not None:
-                    if target == pos:
+                    if pos == target:
                         if seeds_left.get(crop, 0) > 0:
                             ops[unit_id] = ["PLANT", crop]
                             seeds_left[crop] -= 1
@@ -375,7 +492,6 @@ def _assign_units(units, tasks, seeds, money, opp_pressure):
                                 seeds_left[alternative_crop] -= 1
                                 assigned = True
                             else:
-                                # No seeds available to plant, release target
                                 claimed.remove(target)
                     else:
                         ops[unit_id] = [_step_toward(pos, target)]
@@ -388,7 +504,7 @@ def _assign_units(units, tasks, seeds, money, opp_pressure):
         fert_targets = [(x, y) for (x, y, _c) in tasks["needs_fertilize"]]
         target = claim_nearest(fert_targets, pos)
         if target is not None and money >= FERTILIZER_COST:
-            ops[unit_id] = ["FERTILIZE"] if target == pos else [_step_toward(pos, target)]
+            ops[unit_id] = ["FERTILIZE"] if pos == (target[0], target[1]) else [_step_toward(pos, (target[0], target[1]))]
             assigned = True
 
         if assigned:
@@ -400,21 +516,45 @@ def _assign_units(units, tasks, seeds, money, opp_pressure):
     return ops
 
 
-# --------------------------------------------------------------------------
-# Market decisions
-# --------------------------------------------------------------------------
-
-def _market_orders(me, opp, private, market, unlocked, tasks, day, hands_count, hires_today):
+def _market_orders(me, opp, private, market, unlocked, tasks, step, hands_count, hires_today):
+    day = step // 24
     orders = []
     shed = private["shed"]
     prices = market["prices"]
     money = me["money"]
 
+    # Count owned animals first
+    owned_animals = {"GOOSE": 0, "COW": 0, "SHEEP": 0}
+    for row in me["tiles"]:
+        for tile in row:
+            if isinstance(tile, dict) and tile.get("kind") in ("COOP", "PASTURE"):
+                animal = tile.get("animal")
+                if animal in owned_animals:
+                    owned_animals[animal] += 1
+    for animal in owned_animals:
+        owned_animals[animal] += shed.get(animal, 0)
+    # Count animals currently carried in unit inventories
+    for inv in private.get("inventories", []):
+        if inv:
+            for animal in owned_animals:
+                owned_animals[animal] += inv.get(animal, 0)
+    total_fed_animals = owned_animals["COW"] + owned_animals["SHEEP"] + owned_animals["GOOSE"]
+
+    shed_load = sum(shed.values())
+    near_full = shed_load >= (100 - SHED_SAFETY_MARGIN)
+
     # --- 1. Sell what's already in the shed. ---
     for item, count in shed.items():
         if count <= 0 or item in ("GOOSE", "COW", "SHEEP"):
             continue  # don't accidentally sell live animals
-        if item == "FERTILIZER" and tasks["needs_fertilize"] and not (count >= (100 - SHED_SAFETY_MARGIN)):
+        if item == "WHEAT" and total_fed_animals > 0:
+            reserve = total_fed_animals * 2 + 5
+            if count <= reserve:
+                continue
+            else:
+                orders.append(["SELL", "WHEAT", count - reserve])
+                continue
+        if item == "FERTILIZER" and tasks["needs_fertilize"] and not near_full:
             continue  # don't sell fertilizer if we plan to use it to fertilize crops
         base = None
         if item in CROP_INFO:
@@ -422,13 +562,20 @@ def _market_orders(me, opp, private, market, unlocked, tasks, day, hands_count, 
         product_bases = {c["product"]: c["base_price"] for c in ANIMAL_INFO.values()}
         product_bases["FERTILIZER"] = 100
         base = CROP_INFO.get(item, {}).get("base_price") or product_bases.get(item)
-        near_full = count >= (100 - SHED_SAFETY_MARGIN)
+
         if item in CORE_SELL_ALWAYS or base is None:
             orders.append(["SELL", item, count])
         else:
             floor = SELL_FLOOR_FRACTION.get(item, 0.5)
-            price_ok = prices.get(item, base) >= floor * base
-            if price_ok or near_full:
+            if step >= 360:
+                decay_factor = max(0.1, 1.0 - (step - 360) / (700 - 360))
+                floor *= decay_factor
+
+            # If we hold a lot of an item, we should be more willing to sell even at lower prices
+            holding_excess = count > 5
+            adjusted_floor = floor * 0.5 if holding_excess else floor
+            price_ok = prices.get(item, base) >= adjusted_floor * base
+            if price_ok or near_full or prices.get(item, base) >= 20: # never hold if we can get at least $20/unit
                 orders.append(["SELL", item, count])
 
     # --- 2. Opponent-aware nudge: if the opponent is sitting on a lot of
@@ -440,6 +587,8 @@ def _market_orders(me, opp, private, market, unlocked, tasks, day, hands_count, 
             if isinstance(tile, dict) and tile.get("kind") == "PLANT" and tile.get("yield_units", 0) > 0:
                 opp_ripe_crops[tile["crop"]] = opp_ripe_crops.get(tile["crop"], 0) + 1
     for crop, n in opp_ripe_crops.items():
+        if crop in ("WHEAT", "FERTILIZER"):
+            continue
         product = crop
         held = shed.get(product, 0)
         if n >= 3 and held > 0 and ["SELL", product, held] not in orders:
@@ -461,41 +610,62 @@ def _market_orders(me, opp, private, market, unlocked, tasks, day, hands_count, 
             orders.append(["BUY_PRODUCT", "FERTILIZER", 1])
             money -= FERTILIZER_COST
 
-    # --- 5. Animal expansion: goose first (core engine), then one cow once
-    #     established. Buys the animal; a unit will PICKUP + PLACE it later. ---
-    has_coop_planned_or_built = any(
-        isinstance(t, dict) and t.get("kind") == "COOP"
-        for row in me["tiles"] for t in row
-    )
-    goose_owned = shed.get("GOOSE", 0) > 0 or any(
-        isinstance(t, dict) and t.get("kind") == "COOP" and t.get("animal") == "GOOSE"
-        for row in me["tiles"] for t in row
-    )
-    if not has_coop_planned_or_built and money - CASH_RESERVE >= ANIMAL_INFO["GOOSE"]["cost"]:
-        # BUILD_COOP is a farmer/hand tile op, handled in task assignment via
-        # empty_structures once we mark intent; here we just make sure we've
-        # bought the goose so there's something to place. We gate the coop
-        # build itself on having room, handled implicitly (empty_tiles > 0).
-        pass
-    if has_coop_planned_or_built and not goose_owned and money - CASH_RESERVE >= ANIMAL_INFO["GOOSE"]["cost"]:
-        orders.append(["BUY_ANIMAL", "GOOSE", 1])
-        money -= ANIMAL_INFO["GOOSE"]["cost"]
+    # --- 5. Dynamic Animal scaling and structure building purchase ---
 
-    has_pasture = any(
-        isinstance(t, dict) and t.get("kind") == "PASTURE" for row in me["tiles"] for t in row
-    )
-    cow_owned = shed.get("COW", 0) > 0 or any(
-        isinstance(t, dict) and t.get("kind") == "PASTURE" and t.get("animal") == "COW"
-        for row in me["tiles"] for t in row
-    )
-    if has_pasture and not cow_owned and money - CASH_RESERVE >= ANIMAL_INFO["COW"]["cost"] + 500:
-        orders.append(["BUY_ANIMAL", "COW", 1])
-        money -= ANIMAL_INFO["COW"]["cost"]
+    empty_coops = 0
+    empty_pastures = 0
+    for row in me["tiles"]:
+        for tile in row:
+            if isinstance(tile, dict):
+                if tile.get("kind") == "COOP" and tile.get("animal") is None:
+                    empty_coops += 1
+                elif tile.get("kind") == "PASTURE" and tile.get("animal") is None:
+                    empty_pastures += 1
+
+    unlocked_quads = me["unlocked_quadrants"]
+    if len(unlocked_quads) >= 4:
+        pasture_limit = 7
+    elif len(unlocked_quads) >= 3:
+        pasture_limit = 6
+    elif len(unlocked_quads) >= 2:
+        pasture_limit = 3
+    else:
+        pasture_limit = 1
+
+    if step < 500:
+        if empty_pastures > 0:
+            if owned_animals["COW"] < pasture_limit and money - 400 >= 500:
+                orders.append(["BUY_ANIMAL", "COW", 1])
+                money -= 400
+                owned_animals["COW"] += 1
+                empty_pastures -= 1
+            elif owned_animals["SHEEP"] < min(5, pasture_limit) and money - 500 >= 500:
+                orders.append(["BUY_ANIMAL", "SHEEP", 1])
+                money -= 500
+                owned_animals["SHEEP"] += 1
+                empty_pastures -= 1
+
+        if empty_coops > 0 and owned_animals["GOOSE"] < 1 and money - 300 >= 300:
+            orders.append(["BUY_ANIMAL", "GOOSE", 1])
+            money -= 300
+            owned_animals["GOOSE"] += 1
+            empty_coops -= 1
+
+    # --- 5.5. Wheat buy/restock logic to prevent animal starvation ---
+    wheat_in_shed = shed.get("WHEAT", 0)
+    wheat_price = prices.get("WHEAT", 30)
+    if total_fed_animals > 0 and wheat_in_shed < (total_fed_animals * 2 + 5):
+        needed_wheat = (total_fed_animals * 2 + 5) - wheat_in_shed
+        cost = needed_wheat * wheat_price
+        if money - cost >= CASH_RESERVE:
+            orders.append(["BUY_PRODUCT", "WHEAT", needed_wheat])
+            money -= cost
 
     # --- 6. Hire hands while it's still cheap and there's a task backlog. ---
+    actual_planting_backlog = min(len(tasks["empty_tiles"]), sum(private["seeds"].values()))
     pending = (
         len(tasks["needs_water"]) + len(tasks["harvest_ready"]) + len(tasks["weeds"])
-        + len(tasks["animal_needs_feed"]) + len(tasks["empty_tiles"])
+        + len(tasks["animal_needs_feed"]) + actual_planting_backlog
     )
     fib = _fib_hire_cost(hires_today)
     if hands_count + hires_today < MAX_HANDS and pending > (1 + hands_count) and money - CASH_RESERVE >= fib:
@@ -503,14 +673,12 @@ def _market_orders(me, opp, private, market, unlocked, tasks, day, hands_count, 
         money -= fib
         hires_today += 1
 
-    # --- 7. Land expansion once the current farm is nearly full and we have
-    #     a healthy buffer over the purchase cost. ---
+    # --- 7. Land expansion once we have a healthy buffer over the purchase cost ---
     for quad in LAND_ORDER:
         if quad in unlocked:
             continue
         cost = LAND_COST[quad]
-        crowded = len(tasks["empty_tiles"]) <= 2
-        if crowded and money - CASH_RESERVE >= cost * 1.3:
+        if money - cost >= 1000:
             orders.append(["BUY_LAND"])
             money -= cost
         break  # only ever consider the next quadrant in order
@@ -556,11 +724,11 @@ def agent(obs):
     tasks = _scan_farm(me, day, unlocked, half)
 
     opp_pressure = {}  # reserved hook for deeper opponent modeling later
-    unit_ops = _assign_units(units, tasks, private["seeds"], me["money"], opp_pressure)
+    unit_ops = _assign_units(units, tasks, private, me, opp_pressure, half, obs["step"])
 
     hires_today = me.get("hires_today", 0)
     market_orders = _market_orders(
-        me, opp, private, market, unlocked, tasks, day, len(me.get("hands", [])), hires_today
+        me, opp, private, market, unlocked, tasks, obs["step"], len(me.get("hands", [])), hires_today
     )
 
     # Record intended moves for next turn's self-calibration.
