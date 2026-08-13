@@ -76,7 +76,7 @@ SELL_FLOOR_FRACTION = {
     "MILK": 0.55,
     "WOOL": 0.55,
 }
-CORE_SELL_ALWAYS = {"WHEAT", "EGG", "FERTILIZER"}
+CORE_SELL_ALWAYS = {"WHEAT", "EGG"}
 
 FERTILIZER_COST = 100
 MAX_MARKET_ORDERS = 10           # documented default; safe conservative cap
@@ -219,7 +219,7 @@ def _scan_farm(me, day, unlocked, half):
                 age = day - tile["planted_day"]
                 if not tile.get("watered_today", False):
                     needs_water.append((x, y))
-                if tile.get("yield_units", 0) > 0 or age >= CROP_INFO[crop]["max_yield_day"]:
+                if age >= CROP_INFO[crop]["first_yield_day"] and (tile.get("yield_units", 0) > 0 or age >= CROP_INFO[crop]["max_yield_day"]):
                     harvest_ready.append((x, y, crop))
                 elif (
                     crop in FERTILIZE_WORTHY
@@ -278,6 +278,7 @@ def _assign_units(units, tasks, seeds, money, opp_pressure):
     (farmer/hand action, e.g. ["WATER"] or ["EAST"])."""
     ops = {}
     claimed = set()
+    seeds_left = {k: int(v) for k, v in seeds.items()}
 
     def claim_nearest(pos_list, unit_pos):
         avail = [p for p in pos_list if p not in claimed]
@@ -359,10 +360,26 @@ def _assign_units(units, tasks, seeds, money, opp_pressure):
                 target = claim_nearest(tasks["empty_tiles"], pos)
                 if target is not None:
                     if target == pos:
-                        ops[unit_id] = ["PLANT", crop]
+                        if seeds_left.get(crop, 0) > 0:
+                            ops[unit_id] = ["PLANT", crop]
+                            seeds_left[crop] -= 1
+                            assigned = True
+                        else:
+                            alternative_crop = None
+                            for alt_c in CROP_INFO:
+                                if seeds_left.get(alt_c, 0) > 0:
+                                    alternative_crop = alt_c
+                                    break
+                            if alternative_crop is not None:
+                                ops[unit_id] = ["PLANT", alternative_crop]
+                                seeds_left[alternative_crop] -= 1
+                                assigned = True
+                            else:
+                                # No seeds available to plant, release target
+                                claimed.remove(target)
                     else:
                         ops[unit_id] = [_step_toward(pos, target)]
-                    assigned = True
+                        assigned = True
 
         if assigned:
             continue
@@ -397,10 +414,13 @@ def _market_orders(me, opp, private, market, unlocked, tasks, day, hands_count, 
     for item, count in shed.items():
         if count <= 0 or item in ("GOOSE", "COW", "SHEEP"):
             continue  # don't accidentally sell live animals
+        if item == "FERTILIZER" and tasks["needs_fertilize"] and not (count >= (100 - SHED_SAFETY_MARGIN)):
+            continue  # don't sell fertilizer if we plan to use it to fertilize crops
         base = None
         if item in CROP_INFO:
             base = None  # crops aren't sold as seeds; produce items handled below
         product_bases = {c["product"]: c["base_price"] for c in ANIMAL_INFO.values()}
+        product_bases["FERTILIZER"] = 100
         base = CROP_INFO.get(item, {}).get("base_price") or product_bases.get(item)
         near_full = count >= (100 - SHED_SAFETY_MARGIN)
         if item in CORE_SELL_ALWAYS or base is None:
