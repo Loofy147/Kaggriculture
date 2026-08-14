@@ -546,9 +546,47 @@ def _sell_priority(order, obs, step=0):
     return float(unit) * float(qty) * race
 
 
+def _pre_production_animal_harvest(action, obs):
+    """Harvest COW/SHEEP right before scheduled production day to prevent max_held capping."""
+    try:
+        player = int(obs.get("player", 0) or 0)
+        farm = (obs.get("farms") or [])[player]
+        tiles = farm.get("tiles") or []
+        size = len(tiles)
+        day = int(obs.get("day", 0) or 0)
+        positions = [farm.get("farmer", [0, 0]), *(farm.get("hands") or [])]
+
+        farmer_op = action.get("farmer") or ["PASS"]
+        hands_ops = list(action.get("hands") or [])
+        ops = [farmer_op, *hands_ops]
+
+        for actor, pos_raw in enumerate(positions):
+            if actor < len(ops) and ops[actor] and ops[actor][0] != "PASS":
+                continue  # don't override an active movement or non-PASS action
+            x, y = pos_raw
+            if 0 <= y < size and 0 <= x < size:
+                tile = tiles[y][x]
+                if isinstance(tile, dict) and tile.get("kind") in ("COOP", "PASTURE"):
+                    animal = tile.get("animal")
+                    placed_day = int(tile.get("placed_day", 0) or 0)
+                    yield_units = int(tile.get("yield_units", 0) or 0)
+                    if yield_units > 0:
+                        age = day - placed_day
+                        if animal == "COW" and age % 2 == 1:
+                            ops[actor] = ["HARVEST"]
+                        elif animal == "SHEEP" and age % 3 == 2:
+                            ops[actor] = ["HARVEST"]
+
+        action["farmer"] = ops[0]
+        action["hands"] = ops[1:len(positions)]
+    except Exception:
+        pass
+    return action
+
 def agent(obs, config=None):
     """c27 with its SELL layer partially replaced by the market controller."""
     action = _base_agent(obs, config)
+    action = _pre_production_animal_harvest(action, obs)
     try:
         step = int(obs.get("step", 0) or 0)
         # Liquidate one step before the base's own terminal dump. Both dumps hit

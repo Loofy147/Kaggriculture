@@ -1,0 +1,4 @@
+animal,product,purchase_cost,structure,first_yield_day,interval_days,max_held,base_price_at_I0,units_30d_care_on,units_30d_care_off,care_multiplier,steady_state_units_per_day_care_on,gross_revenue_per_animal_day,feed_cost_per_animal_day,net_revenue_per_animal_day
+GOOSE,EGG,300,COOP,4,1,4,50,56,27,2.0741,2.0,100.0,25,75.0
+COW,MILK,400,PASTURE,8,2,6,160,39,12,3.25,1.5,240.0,25,215.0
+SHEEP,WOOL,500,PASTURE,6,3,6,200,38,9,4.2222,1.3333,266.67,25,241.67

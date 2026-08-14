@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+kaggriculture-meta/
+kaggriculture-benchmark/
