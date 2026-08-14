@@ -1,0 +1,61 @@
+episode_id,date,agent_a,agent_b,reward_a,reward_b,winner,margin,both_done,steps
+89229057,2026-08-02,smlcr,Yonatan Nemtsov,117309.0,122988.0,Yonatan Nemtsov,5679.0,True,720
+89229062,2026-08-02,radiant-allomancer,chocolat,98828.0,108423.0,chocolat,9595.0,True,720
+89229577,2026-08-02,chocolat,radiant-allomancer,101013.0,82076.0,chocolat,18937.0,True,720
+89230099,2026-08-02,chocolat,smlcr,120191.0,120643.0,smlcr,452.0,True,720
+89230609,2026-08-02,chocolat,radiant-allomancer,116568.0,116934.0,radiant-allomancer,366.0,True,720
+89235722,2026-08-02,radiant-allomancer,chocolat,136422.0,122896.0,radiant-allomancer,13526.0,True,720
+89236753,2026-08-02,yjhv buddies,radiant-allomancer,99865.0,116837.0,radiant-allomancer,16972.0,True,720
+89236759,2026-08-02,RuiKimura4,chocolat,118588.0,116777.0,RuiKimura4,1811.0,True,720
+89237260,2026-08-02,Sheep,radiant-allomancer,124653.0,126670.0,radiant-allomancer,2017.0,True,720
+89237774,2026-08-02,Yonatan Nemtsov,radiant-allomancer,114089.0,128897.0,radiant-allomancer,14808.0,True,720
+91476157,2026-08-10,chungkuangwen,DL,71757.0,72794.0,DL,1037.0,True,720
+91476165,2026-08-10,Valmorlee,THUNDER THUNDER,64005.0,65033.0,THUNDER THUNDER,1028.0,True,720
+91476211,2026-08-10,青烟,Freddy,51247.0,46610.0,青烟,4637.0,True,720
+91477087,2026-08-10,infamemconculcemus,VN-Orion,51734.0,56458.0,VN-Orion,4724.0,True,720
+91477199,2026-08-10,brocade,Valmorlee,60954.0,59884.0,brocade,1070.0,True,720
+91478030,2026-08-10,VN-Orion,Efe Can Celiksoy,119919.0,118428.0,VN-Orion,1491.0,True,720
+91478137,2026-08-10,Wufang Hong,HealthStone,109386.0,106632.0,Wufang Hong,2754.0,True,720
+91478164,2026-08-10,HealthStone,Gbining,58406.0,54224.0,HealthStone,4182.0,True,720
+91478166,2026-08-10,brocade,Elzandi Irfan Zikra,128133.0,130595.0,Elzandi Irfan Zikra,2462.0,True,720
+91478168,2026-08-10,THUNDER THUNDER,Seb (allegedly),85378.0,79122.0,THUNDER THUNDER,6256.0,True,720
+91478170,2026-08-10,Stocks152,VN-Orion,66990.0,65604.0,Stocks152,1386.0,True,720
+91478181,2026-08-10,Efe Can Celiksoy,Zakaria Settar,74253.0,63693.0,Efe Can Celiksoy,10560.0,True,720
+91478949,2026-08-10,Efe Can Celiksoy,Valmorlee,98521.0,111092.0,Valmorlee,12571.0,True,720
+91478954,2026-08-10,Valmorlee,Latifa Riziki,125194.0,113384.0,Valmorlee,11810.0,True,720
+91479027,2026-08-10,DL,Mohammed Nomaan,93480.0,97279.0,Mohammed Nomaan,3799.0,True,720
+91479819,2026-08-10,Nikita Lugovoy,Stocks152,62265.0,59924.0,Nikita Lugovoy,2341.0,True,720
+91480774,2026-08-10,Stocks152,ShaoCharles,68100.0,68541.0,ShaoCharles,441.0,True,720
+91481652,2026-08-10,Stocks152,Nikita Lugovoy,85402.0,89897.0,Nikita Lugovoy,4495.0,True,720
+91481682,2026-08-10,Wufang Hong,ShaoCharles,82462.0,86010.0,ShaoCharles,3548.0,True,720
+91481690,2026-08-10,Nikita Lugovoy,Efe Can Celiksoy,56062.0,53330.0,Nikita Lugovoy,2732.0,True,720
+91482618,2026-08-10,Efe Can Celiksoy,DL,124658.0,126152.0,DL,1494.0,True,720
+91482666,2026-08-10,VN-Orion,青烟,61081.0,61166.0,青烟,85.0,True,720
+91483600,2026-08-10,Natalia Mawyin,Valmorlee,112996.0,124850.0,Valmorlee,11854.0,True,720
+91483607,2026-08-10,brocade,Valmorlee,110298.0,114869.0,Valmorlee,4571.0,True,720
+91483647,2026-08-10,VN-Orion,Efe Can Celiksoy,46504.0,47535.0,Efe Can Celiksoy,1031.0,True,720
+91484426,2026-08-10,Valmorlee,Nikita Lugovoy,98994.0,98173.0,Valmorlee,821.0,True,720
+91484449,2026-08-10,ShaoCharles,Mohammed Nomaan,95505.0,94006.0,ShaoCharles,1499.0,True,720
+91484503,2026-08-10,Hajime Tamura,Mohammed Nomaan,80428.0,100234.0,Mohammed Nomaan,19806.0,True,720
+91484527,2026-08-10,HealthStone,Valmorlee,88698.0,87316.0,HealthStone,1382.0,True,720
+91484528,2026-08-10,Elzandi Irfan Zikra,Gbining,50173.0,52024.0,Gbining,1851.0,True,720
+91484531,2026-08-10,Elzandi Irfan Zikra,青烟,53883.0,56095.0,青烟,2212.0,True,720
+91484532,2026-08-10,Seb (allegedly),Elzandi Irfan Zikra,96437.0,113734.0,Elzandi Irfan Zikra,17297.0,True,720
+91484533,2026-08-10,THUNDER THUNDER,Stocks152,102022.0,95545.0,THUNDER THUNDER,6477.0,True,720
+91486287,2026-08-10,Zakaria Settar,ShaoCharles,78999.0,94810.0,ShaoCharles,15811.0,True,720
+91488923,2026-08-10,Ezzzzzekki,Gbining,48030.0,46484.0,Ezzzzzekki,1546.0,True,720
+91489000,2026-08-10,Nikita Lugovoy,HealthStone,62973.0,64635.0,HealthStone,1662.0,True,720
+91489077,2026-08-10,brocade,Freddy,53998.0,47178.0,brocade,6820.0,True,720
+91489917,2026-08-10,Nikita Lugovoy,Efe Can Celiksoy,116359.0,112061.0,Nikita Lugovoy,4298.0,True,720
+91490044,2026-08-10,brocade,Efe Can Celiksoy,80892.0,86145.0,Efe Can Celiksoy,5253.0,True,720
+91490781,2026-08-10,Ezzzzzekki,ShaoCharles,146935.0,145550.0,Ezzzzzekki,1385.0,True,720
+91490846,2026-08-10,Nikita Lugovoy,Latifa Riziki,75276.0,69243.0,Nikita Lugovoy,6033.0,True,720
+91490848,2026-08-10,souju00,Nikita Lugovoy,44624.0,49233.0,Nikita Lugovoy,4609.0,True,720
+91490923,2026-08-10,Nikita Lugovoy,Valmorlee,79459.0,79716.0,Valmorlee,257.0,True,720
+91490950,2026-08-10,Stocks152,Valmorlee,112259.0,111137.0,Stocks152,1122.0,True,720
+91490951,2026-08-10,HealthStone,Seb (allegedly),78039.0,68994.0,HealthStone,9045.0,True,720
+91490952,2026-08-10,青烟,Wufang Hong,140633.0,139319.0,青烟,1314.0,True,720
+91490953,2026-08-10,Seb (allegedly),Valmorlee,59761.0,80602.0,Valmorlee,20841.0,True,720
+91490954,2026-08-10,Stocks152,Natalia Mawyin,125209.0,128710.0,Natalia Mawyin,3501.0,True,720
+91490957,2026-08-10,THUNDER THUNDER,Valmorlee,98381.0,97763.0,THUNDER THUNDER,618.0,True,720
+91490962,2026-08-10,THUNDER THUNDER,Elzandi Irfan Zikra,82750.0,70287.0,THUNDER THUNDER,12463.0,True,720

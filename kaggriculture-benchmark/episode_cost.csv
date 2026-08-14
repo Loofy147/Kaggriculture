@@ -1,0 +1,9 @@
+matchup,opponent_class,n_episodes,median_seconds_per_episode,min_seconds,max_seconds,measured,reproducible_by_reader,note
+starter_vs_starter,engine_builtin,10,1.38,1.273,1.492,live_at_build_time_warm,True,"single-core, load-dependent; repeat runs on the same machine ranged 0.62-1.67 s"
+random_vs_random,engine_builtin,10,1.692,1.601,1.779,live_at_build_time_warm,True,"single-core, load-dependent; repeat runs on the same machine ranged 0.62-1.67 s"
+starter_vs_random,engine_builtin,10,1.542,1.437,1.853,live_at_build_time_warm,True,"single-core, load-dependent; repeat runs on the same machine ranged 0.62-1.67 s"
+v9_vs_opp_c03,extracted_third_party,1,2.12,2.12,2.12,campaign_log_2026-08-08,False,opponent module is an extracted third-party agent and is NOT shipped in this dataset
+v9_vs_opp_c25,extracted_third_party,1,1.95,1.95,1.95,campaign_log_2026-08-08,False,opponent module is an extracted third-party agent and is NOT shipped in this dataset
+v9_vs_opp_adaptive,extracted_third_party,1,1.91,1.91,1.91,campaign_log_2026-08-08,False,opponent module is an extracted third-party agent and is NOT shipped in this dataset
+v9_vs_opp_kaito177,extracted_third_party,1,2.22,2.22,2.22,campaign_log_2026-08-08,False,opponent module is an extracted third-party agent and is NOT shipped in this dataset
+v9_vs_opp_ensemble,extracted_third_party,1,2.17,2.17,2.17,campaign_log_2026-08-08,False,opponent module is an extracted third-party agent and is NOT shipped in this dataset

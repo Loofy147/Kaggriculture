@@ -1,0 +1,3 @@
+agent,local_pool_n,local_pool_win_rate,local_wilson_lo,local_wilson_hi,local_vs_opp_c03_win_rate,public_ladder_score,ladder_read_utc,local_rank,ladder_rank
+v9,2880,0.285069,0.268876,0.301835,0.427083,752.7,2026-08-08T05:57Z,1,2
+v8,2880,0.204167,0.189843,0.219278,0.015625,758.6,2026-08-08T05:57Z,2,1
