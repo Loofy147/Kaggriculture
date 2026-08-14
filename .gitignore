@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 kaggriculture-meta/
 kaggriculture-benchmark/
+kaggriculture-ref-agents/
+kaggriculture-openings/
+kaggriculture-fingerprints/
