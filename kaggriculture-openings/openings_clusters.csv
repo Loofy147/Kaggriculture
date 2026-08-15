@@ -1,0 +1,6 @@
+team,ladder_score,cluster,signature,public_agent,notes
+Seb,3201.1,counter_meta,"14 hires day0, 4 quads eventual, 9C+11S final, aggressive labor",False,Rank 1 on leaderboard. Big-footprint counter to standard fork race.
+HealthStone,3132.9,sheep_first_hybrid,"3 hires day0, 1C+4S day0, 8C+4S final, sheep-first CARE",False,Rank 2. Sheep-first exploits CARE compounding (3-day interval).
+tao_wu11,3131.4,v23_fork,"5 hires day0, 2C+2S day0, 8C+6S final, 7W/12M/0S seeds",True,"Identical opening to Mohamed, mrgrishninsb, v23 self-play."
+Mohamed,3123.1,v23_fork,"5 hires day0, 2C+2S day0, 8C+6S final, 7W/12M/0S seeds",True,Same opening signature as v23 (kaitofukami).
+mrgrishninsb,3117.6,v23_fork,"5 hires day0, 2C+2S day0, 8C+6S final, 7W/12M/0S seeds",True,Same opening signature as v23.
