@@ -72,7 +72,7 @@ def _update_clone_profile(obs, step):
 
 
 def _front_run(action, obs, step):
-    """Sell one premium line or front-run buys immediately before a clone's expected action."""
+    """Sell one premium line immediately before a clone's expected glut."""
     if _CLONE_CONFIDENCE < 2 or _FRONT_RUN_HORIZON <= 0:
         return
     orders = list(action.get("market", []) or [])
@@ -87,22 +87,17 @@ def _front_run(action, obs, step):
     for future_step in range(step + 1, end):
         distance = future_step - step
         for order in _TRACE[future_step].get("market", []) or []:
-            if not (isinstance(order, list) and len(order) >= 3):
+            if not (
+                isinstance(order, list) and len(order) >= 3
+                and order[0] == "SELL" and order[1] in _FRONT_RUN_ITEMS
+            ):
                 continue
-            op, item = order[0], order[1]
-            if op == "SELL" and item in _FRONT_RUN_ITEMS:
-                quantity = max(0, int(order[2] or 0))
-                if item not in planned:
-                    planned[item] = [distance, quantity]
-                else:
-                    planned[item][1] += quantity
-            elif op in ("BUY_ANIMAL", "BUY_SEED"):
-                quantity = max(0, int(order[2] or 0))
-                my_money = float(((obs.get("farms") or [{}])[int(obs.get("player", 0) or 0)]).get("money", 0) or 0)
-                if my_money > 1000 and len(orders) < 10:
-                    if not any(isinstance(o, list) and len(o) >= 2 and o[0] == op and o[1] == item for o in orders):
-                        orders.append([op, item, quantity])
-                        action["market"] = orders[:10]
+            item = order[1]
+            quantity = max(0, int(order[2] or 0))
+            if item not in planned:
+                planned[item] = [distance, quantity]
+            else:
+                planned[item][1] += quantity
     shed = (obs.get("private") or {}).get("shed") or {}
     prices = ((obs.get("market") or {}).get("prices") or {})
     choices = []
@@ -959,114 +954,5 @@ def agent(obs, config=None):
 # runner and interpreted ``config`` as an action, resulting in 720 PASS turns.
 # Give the real entrypoint a fresh, final binding so callable and file-path
 # execution select the same policy.
-
-
-def _market_squeeze_agent(obs, action):
-    step = int(obs.get("step", 0) or 0)
-    if step >= 717:
-        return action
-
-    seat = int(obs.get("player", 0) or 0)
-    farms = obs.get("farms") or []
-    if len(farms) < 2:
-        return action
-
-    opp_farm = farms[1 - seat]
-    my_farm = farms[seat]
-
-    # Count opponent's hungry animals
-    opp_animals = sum(
-        1 for row in (opp_farm.get("tiles") or [])
-        for tile in (row or [])
-        if isinstance(tile, dict) and tile.get("animal") in ("COW", "SHEEP", "GOOSE")
-    )
-
-    opp_money = float(opp_farm.get("money", 0) or 0)
-    inventory = (obs.get("market") or {}).get("inventory") or {}
-    wheat_inv = int(inventory.get("WHEAT", 10000) or 10000)
-
-    # If the opponent is heavily invested in animals but the market wheat supply is dropping
-    if opp_animals > 3 and opp_money > 100 and wheat_inv < 9800:
-        market_orders = action.get("market") or []
-
-        # Don't squeeze if it ruins our own trace's buys
-        if len(market_orders) < 10 and not any(isinstance(o, list) and o and o[0] == "BUY_PRODUCT" and len(o) >= 2 and o[1] == "WHEAT" for o in market_orders):
-            my_money = float(my_farm.get("money", 0) or 0)
-            # Only squeeze if we have safe disposable income
-            if my_money > 500:
-                market_orders = list(market_orders)
-                market_orders.append(["BUY_PRODUCT", "WHEAT", 5])
-                action["market"] = market_orders[:10]
-
-    return action
-
-
-_squeeze_host_agent = agent
-
-
-def agent(obs, config=None):
-    action = _squeeze_host_agent(obs, config)
-    try:
-        return _market_squeeze_agent(obs, action)
-    except Exception:
-        return action
-
-
-
-
-def _collision_repair_agent(obs, action):
-    seat = int(obs.get("player", 0) or 0)
-    farms = obs.get("farms") or []
-    if len(farms) < 2:
-        return action
-
-    my_farm = farms[seat]
-    opp_farm = farms[1 - seat]
-
-    # Get all opponent physical coordinates
-    opp_positions = set()
-    if "farmer" in opp_farm and opp_farm["farmer"]:
-        opp_positions.add(tuple(opp_farm["farmer"]))
-    for hand in (opp_farm.get("hands") or []):
-        if hand:
-            opp_positions.add(tuple(hand))
-
-    my_positions = [my_farm.get("farmer", [0, 0]), *(my_farm.get("hands") or [])]
-    ops = [action.get("farmer") or ["PASS"], *(action.get("hands") or [])]
-
-    # Check if any of our planned movements step directly into an opponent
-    for actor, pos in enumerate(my_positions):
-        if actor >= len(ops):
-            break
-        op = ops[actor]
-
-        if isinstance(op, list) and op and op[0] in ("NORTH", "SOUTH", "EAST", "WEST"):
-            dx, dy = {"NORTH": (0, -1), "SOUTH": (0, 1), "EAST": (1, 0), "WEST": (-1, 0)}[op[0]]
-            target_pos = (pos[0] + dx, pos[1] + dy)
-
-            # If our trace wants to walk into an opponent, stall for a turn to let them pass.
-            if target_pos in opp_positions:
-                ops[actor] = ["PASS"]
-                global _weed_repair_pending
-                if actor not in _weed_repair_pending:
-                    _weed_repair_pending[actor] = []
-                _weed_repair_pending[actor].insert(0, op)
-
-    action["farmer"] = ops[0]
-    action["hands"] = ops[1:max(1, len(my_positions))]
-    return action
-
-
-_collision_host_agent = agent
-
-
-def agent(obs, config=None):
-    action = _collision_host_agent(obs, config)
-    try:
-        return _collision_repair_agent(obs, action)
-    except Exception:
-        return action
-
-
 def kaggle_submission_agent(obs, config=None):
     return agent(obs, config)
