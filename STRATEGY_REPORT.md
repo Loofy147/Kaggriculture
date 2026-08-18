@@ -51,3 +51,21 @@ Analysis of live Kaggle ladder datasets (`georgymamarin/kaggriculture-episodes`,
 2. **`main (3).py` (Dynamic Heuristic State-Machine Agent)**
    - Dynamic heuristic task assignment engine for farmer and farm hands.
    - Fully repaired: resolves day-0 immature crop harvesting, virtual seed tracking, fertilizer/wheat buy-sell loops, center shed tile building protection, and land-gated animal scaling.
+
+---
+
+## Hierarchical Architecture & Multi-Layer System Design
+
+To operationalize RL-native and trajectory-replay agents safely in competitive farming environments, the execution pipeline is structured into a multi-layer framework:
+
+### 1. The Weekly Meta-Controller (Macro-Temporal Layer)
+- **Role**: Evaluates global market conditions, shop unlock progression, and opponent inventory accumulation on periodic cycles (e.g. weekly or every N turns).
+- **Function**: Dynamically adjusts execution parameters such as `_FRONT_RUN_HORIZON`, `_EARLY_TERMINAL` step thresholds, and reservation price decays to engineer market squeezes and front-run opponent liquidations.
+
+### 2. Calculated Field Engine & Action Masking (The Shield)
+- **Role**: Pre-computation layer evaluating metric matrices (effective yields, holding costs, and order book depth) before action selection.
+- **Function**: Constructs a dynamic action mask (e.g. checking minimum wheat feed reserves `owned_animals * 2 + 5` and shed capacity limits) that filters out illegal or value-destroying moves before execution.
+
+### 3. State-Triggered Fallbacks
+- **Role**: Safety monitor evaluating output confidence and market volatility.
+- **Function**: If optimization models encounter noisy or out-of-distribution state spaces, the system automatically falls back to deterministic rule sets and verified baseline traces to prevent catastrophic decisions.
