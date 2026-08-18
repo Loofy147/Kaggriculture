@@ -1,0 +1,1082 @@
+{
+  "protocol": {
+    "baseline_note": "Representative implementations of architecture families; not claim-equivalent reimplementations of cited papers.",
+    "in_distribution": {
+      "seeds": 40,
+      "profiles": [
+        "local",
+        "regime",
+        "structural",
+        "adversarial",
+        "mixed"
+      ],
+      "same_world_per_agent": true
+    },
+    "ood": {
+      "seeds": 20,
+      "unseen_config": true,
+      "profiles": [
+        "local",
+        "regime",
+        "structural",
+        "adversarial",
+        "mixed"
+      ]
+    }
+  },
+  "checks": {
+    "in_distribution_pairs": {
+      "pass": true,
+      "scenario_count": 200,
+      "bad_scenarios": {}
+    },
+    "ood_pairs": {
+      "pass": true,
+      "scenario_count": 100,
+      "bad_scenarios": {}
+    },
+    "in_profiles": {
+      "pass": true,
+      "counts": {
+        "local": 280,
+        "regime": 280,
+        "structural": 280,
+        "adversarial": 280,
+        "mixed": 280
+      }
+    },
+    "ood_profiles": {
+      "pass": true,
+      "counts": {
+        "local": 140,
+        "regime": 140,
+        "structural": 140,
+        "adversarial": 140,
+        "mixed": 140
+      }
+    },
+    "oracle_leakage_schema": {
+      "pass": true,
+      "observation_fields": [
+        "agent_pos",
+        "blocked_visible",
+        "future_resource_pressure",
+        "opponent_vulnerability",
+        "pressure_action",
+        "regime_signal",
+        "resource_prediction_confidence",
+        "step",
+        "trace_cursor",
+        "visible_opponents",
+        "visible_resources"
+      ],
+      "forbidden_present": []
+    },
+    "deterministic_replay": {
+      "pass": true,
+      "hash_1": "b5a1299541d3085275e5a0f650e9860c8bf9f81c3ea2e51bfd157e125ed4af28",
+      "hash_2": "b5a1299541d3085275e5a0f650e9860c8bf9f81c3ea2e51bfd157e125ed4af28"
+    }
+  },
+  "in_distribution": {
+    "aggregate": {
+      "trace_only": {
+        "reward": 8.84874999999999,
+        "goals_collected": 2.49,
+        "goals_lost": 4.47,
+        "catastrophic_failures": 4.51,
+        "blocked_actions": 1.22,
+        "partial_actions": 0.115,
+        "interventions": 0,
+        "switches": 0,
+        "trace_match": 1.0,
+        "recovery_debt": 1.246,
+        "max_deviation": 0.195,
+        "success_rate": 0.0
+      },
+      "trace_reactive": {
+        "reward": 8.261874999999991,
+        "goals_collected": 2.41,
+        "goals_lost": 4.535,
+        "catastrophic_failures": 4.69,
+        "blocked_actions": 1.105,
+        "partial_actions": 0.1,
+        "interventions": 0.365,
+        "switches": 0,
+        "trace_match": 0.9939166666666667,
+        "recovery_debt": 1.136,
+        "max_deviation": 0.36,
+        "success_rate": 0.0
+      },
+      "behavior_tree": {
+        "reward": 8.19187499999999,
+        "goals_collected": 2.405,
+        "goals_lost": 4.53,
+        "catastrophic_failures": 4.78,
+        "blocked_actions": 1.105,
+        "partial_actions": 0.1,
+        "interventions": 0.465,
+        "switches": 0,
+        "trace_match": 0.99225,
+        "recovery_debt": 1.136,
+        "max_deviation": 0.38,
+        "success_rate": 0.0
+      },
+      "plan_monitor_repair": {
+        "reward": 5.197124999999994,
+        "goals_collected": 2.085,
+        "goals_lost": 4.655,
+        "catastrophic_failures": 4.825,
+        "blocked_actions": 1.28,
+        "partial_actions": 0.09,
+        "interventions": 5.125,
+        "switches": 0,
+        "trace_match": 0.9145833333333333,
+        "recovery_debt": 1.3105,
+        "max_deviation": 1.48,
+        "success_rate": 0.0
+      },
+      "simplex_representative": {
+        "reward": 14.082249999999966,
+        "goals_collected": 2.55,
+        "goals_lost": 4.23,
+        "catastrophic_failures": 0.89,
+        "blocked_actions": 1.525,
+        "partial_actions": 0.145,
+        "interventions": 28.175,
+        "switches": 1.72,
+        "trace_match": 0.5304166666666666,
+        "recovery_debt": 1.569,
+        "max_deviation": 1.705,
+        "success_rate": 0.0
+      },
+      "option_switch": {
+        "reward": 8.71812499999999,
+        "goals_collected": 2.45,
+        "goals_lost": 4.505,
+        "catastrophic_failures": 4.51,
+        "blocked_actions": 1.06,
+        "partial_actions": 0.105,
+        "interventions": 0.99,
+        "switches": 1.39,
+        "trace_match": 0.9835,
+        "recovery_debt": 1.088,
+        "max_deviation": 0.54,
+        "success_rate": 0.0
+      },
+      "validity_aware_prototype": {
+        "reward": 10.728624999999992,
+        "goals_collected": 2.035,
+        "goals_lost": 4.57,
+        "catastrophic_failures": 1.755,
+        "blocked_actions": 0.325,
+        "partial_actions": 0.09,
+        "interventions": 21.065,
+        "switches": 0.99,
+        "trace_match": 0.6489166666666667,
+        "recovery_debt": 0.352,
+        "max_deviation": 1.005,
+        "success_rate": 0.0
+      }
+    },
+    "profile_aggregate": {
+      "local": {
+        "trace_only": {
+          "reward": 9.049999999999992,
+          "success_rate": 0.0,
+          "goals_collected": 2.25,
+          "goals_lost": 4.75,
+          "catastrophic_failures": 4.75,
+          "interventions": 0,
+          "switches": 0,
+          "recovery_debt": 0.31
+        },
+        "trace_reactive": {
+          "reward": 8.581249999999994,
+          "success_rate": 0.0,
+          "goals_collected": 2.15,
+          "goals_lost": 4.85,
+          "catastrophic_failures": 4.95,
+          "interventions": 0.7,
+          "switches": 0,
+          "recovery_debt": 0.0325
+        },
+        "behavior_tree": {
+          "reward": 8.824999999999994,
+          "success_rate": 0.0,
+          "goals_collected": 2.175,
+          "goals_lost": 4.825,
+          "catastrophic_failures": 5,
+          "interventions": 0.8,
+          "switches": 0,
+          "recovery_debt": 0.0325
+        },
+        "plan_monitor_repair": {
+          "reward": 6.611249999999994,
+          "success_rate": 0.0,
+          "goals_collected": 2,
+          "goals_lost": 5,
+          "catastrophic_failures": 4.95,
+          "interventions": 4.375,
+          "switches": 0,
+          "recovery_debt": 0.535
+        },
+        "simplex_representative": {
+          "reward": 15.96249999999997,
+          "success_rate": 0.0,
+          "goals_collected": 2.5,
+          "goals_lost": 4.5,
+          "catastrophic_failures": 0.625,
+          "interventions": 29.825,
+          "switches": 1.9,
+          "recovery_debt": 0.38
+        },
+        "option_switch": {
+          "reward": 8.331249999999992,
+          "success_rate": 0.0,
+          "goals_collected": 2.2,
+          "goals_lost": 4.8,
+          "catastrophic_failures": 4.675,
+          "interventions": 1.175,
+          "switches": 1.8,
+          "recovery_debt": 0.5075
+        },
+        "validity_aware_prototype": {
+          "reward": 11.899999999999988,
+          "success_rate": 0.0,
+          "goals_collected": 2.175,
+          "goals_lost": 4.825,
+          "catastrophic_failures": 1.6,
+          "interventions": 21.25,
+          "switches": 1.05,
+          "recovery_debt": 0.495
+        }
+      },
+      "regime": {
+        "trace_only": {
+          "reward": 7.656249999999993,
+          "success_rate": 0.0,
+          "goals_collected": 2.375,
+          "goals_lost": 4.625,
+          "catastrophic_failures": 4.625,
+          "interventions": 0,
+          "switches": 0,
+          "recovery_debt": 0.035
+        },
+        "trace_reactive": {
+          "reward": 6.706249999999994,
+          "success_rate": 0.0,
+          "goals_collected": 2.275,
+          "goals_lost": 4.725,
+          "catastrophic_failures": 4.825,
+          "interventions": 0.1,
+          "switches": 0,
+          "recovery_debt": 0.0325
+        },
+        "behavior_tree": {
+          "reward": 6.693749999999993,
+          "success_rate": 0.0,
+          "goals_collected": 2.275,
+          "goals_lost": 4.725,
+          "catastrophic_failures": 4.875,
+          "interventions": 0.175,
+          "switches": 0,
+          "recovery_debt": 0.0325
+        },
+        "plan_monitor_repair": {
+          "reward": 5.461249999999993,
+          "success_rate": 0.0,
+          "goals_collected": 2.075,
+          "goals_lost": 4.925,
+          "catastrophic_failures": 5.025,
+          "interventions": 3.8,
+          "switches": 0,
+          "recovery_debt": 0.037500000000000006
+        },
+        "simplex_representative": {
+          "reward": 17.51624999999996,
+          "success_rate": 0.0,
+          "goals_collected": 2.55,
+          "goals_lost": 4.45,
+          "catastrophic_failures": 0.175,
+          "interventions": 32.675,
+          "switches": 0.35,
+          "recovery_debt": 0.052500000000000005
+        },
+        "option_switch": {
+          "reward": 6.706249999999994,
+          "success_rate": 0.0,
+          "goals_collected": 2.275,
+          "goals_lost": 4.725,
+          "catastrophic_failures": 4.825,
+          "interventions": 0.1,
+          "switches": 0,
+          "recovery_debt": 0.0325
+        },
+        "validity_aware_prototype": {
+          "reward": 12.511874999999986,
+          "success_rate": 0.0,
+          "goals_collected": 2.175,
+          "goals_lost": 4.825,
+          "catastrophic_failures": 1.825,
+          "interventions": 19.95,
+          "switches": 1,
+          "recovery_debt": 0.0325
+        }
+      },
+      "structural": {
+        "trace_only": {
+          "reward": 6.031249999999991,
+          "success_rate": 0.0,
+          "goals_collected": 2.375,
+          "goals_lost": 4.625,
+          "catastrophic_failures": 4.625,
+          "interventions": 0,
+          "switches": 0,
+          "recovery_debt": 2.785
+        },
+        "trace_reactive": {
+          "reward": 5.124999999999993,
+          "success_rate": 0.0,
+          "goals_collected": 2.275,
+          "goals_lost": 4.7,
+          "catastrophic_failures": 4.825,
+          "interventions": 0.15,
+          "switches": 0,
+          "recovery_debt": 2.7575
+        },
+        "behavior_tree": {
+          "reward": 5.112499999999993,
+          "success_rate": 0.0,
+          "goals_collected": 2.275,
+          "goals_lost": 4.7,
+          "catastrophic_failures": 4.875,
+          "interventions": 0.225,
+          "switches": 0,
+          "recovery_debt": 2.7575
+        },
+        "plan_monitor_repair": {
+          "reward": 5.6362499999999915,
+          "success_rate": 0.0,
+          "goals_collected": 2.075,
+          "goals_lost": 4.9,
+          "catastrophic_failures": 4.7,
+          "interventions": 5.3,
+          "switches": 0,
+          "recovery_debt": 1.6875
+        },
+        "simplex_representative": {
+          "reward": 8.399999999999972,
+          "success_rate": 0.0,
+          "goals_collected": 2.55,
+          "goals_lost": 4.375,
+          "catastrophic_failures": 1.75,
+          "interventions": 23.5,
+          "switches": 1.575,
+          "recovery_debt": 4.2525
+        },
+        "option_switch": {
+          "reward": 5.1937499999999925,
+          "success_rate": 0.0,
+          "goals_collected": 2.275,
+          "goals_lost": 4.7,
+          "catastrophic_failures": 4.725,
+          "interventions": 0.425,
+          "switches": 0.9,
+          "recovery_debt": 2.7325
+        },
+        "validity_aware_prototype": {
+          "reward": 12.532499999999986,
+          "success_rate": 0.0,
+          "goals_collected": 2.175,
+          "goals_lost": 4.8,
+          "catastrophic_failures": 1.75,
+          "interventions": 20.275,
+          "switches": 1,
+          "recovery_debt": 0.1075
+        }
+      },
+      "adversarial": {
+        "trace_only": {
+          "reward": 15.693749999999985,
+          "success_rate": 0.0,
+          "goals_collected": 2.825,
+          "goals_lost": 4.175,
+          "catastrophic_failures": 4.175,
+          "interventions": 0,
+          "switches": 0,
+          "recovery_debt": 0.022500000000000003
+        },
+        "trace_reactive": {
+          "reward": 15.143749999999986,
+          "success_rate": 0.0,
+          "goals_collected": 2.775,
+          "goals_lost": 4.2,
+          "catastrophic_failures": 4.325,
+          "interventions": 0.1,
+          "switches": 0,
+          "recovery_debt": 0.027500000000000004
+        },
+        "behavior_tree": {
+          "reward": 14.849999999999985,
+          "success_rate": 0.0,
+          "goals_collected": 2.75,
+          "goals_lost": 4.2,
+          "catastrophic_failures": 4.475,
+          "interventions": 0.225,
+          "switches": 0,
+          "recovery_debt": 0.027500000000000004
+        },
+        "plan_monitor_repair": {
+          "reward": 9.556249999999995,
+          "success_rate": 0.0,
+          "goals_collected": 2.2,
+          "goals_lost": 4.225,
+          "catastrophic_failures": 4.875,
+          "interventions": 4,
+          "switches": 0,
+          "recovery_debt": 0.022500000000000003
+        },
+        "simplex_representative": {
+          "reward": 17.008749999999964,
+          "success_rate": 0.0,
+          "goals_collected": 2.45,
+          "goals_lost": 3.9,
+          "catastrophic_failures": 0.1,
+          "interventions": 32.85,
+          "switches": 0.2,
+          "recovery_debt": 0.0325
+        },
+        "option_switch": {
+          "reward": 15.143749999999986,
+          "success_rate": 0.0,
+          "goals_collected": 2.775,
+          "goals_lost": 4.2,
+          "catastrophic_failures": 4.325,
+          "interventions": 0.1,
+          "switches": 0,
+          "recovery_debt": 0.027500000000000004
+        },
+        "validity_aware_prototype": {
+          "reward": 9.4875,
+          "success_rate": 0.0,
+          "goals_collected": 1.85,
+          "goals_lost": 4.2,
+          "catastrophic_failures": 1.975,
+          "interventions": 20.825,
+          "switches": 0.95,
+          "recovery_debt": 0.025
+        }
+      },
+      "mixed": {
+        "trace_only": {
+          "reward": 5.812499999999991,
+          "success_rate": 0.0,
+          "goals_collected": 2.625,
+          "goals_lost": 4.175,
+          "catastrophic_failures": 4.375,
+          "interventions": 0,
+          "switches": 0,
+          "recovery_debt": 3.0775
+        },
+        "trace_reactive": {
+          "reward": 5.753124999999991,
+          "success_rate": 0.0,
+          "goals_collected": 2.575,
+          "goals_lost": 4.2,
+          "catastrophic_failures": 4.525,
+          "interventions": 0.775,
+          "switches": 0,
+          "recovery_debt": 2.83
+        },
+        "behavior_tree": {
+          "reward": 5.4781249999999915,
+          "success_rate": 0.0,
+          "goals_collected": 2.55,
+          "goals_lost": 4.2,
+          "catastrophic_failures": 4.675,
+          "interventions": 0.9,
+          "switches": 0,
+          "recovery_debt": 2.83
+        },
+        "plan_monitor_repair": {
+          "reward": -1.2793750000000013,
+          "success_rate": 0.0,
+          "goals_collected": 2.075,
+          "goals_lost": 4.225,
+          "catastrophic_failures": 4.575,
+          "interventions": 8.15,
+          "switches": 0,
+          "recovery_debt": 4.27
+        },
+        "simplex_representative": {
+          "reward": 11.523749999999966,
+          "success_rate": 0.0,
+          "goals_collected": 2.7,
+          "goals_lost": 3.925,
+          "catastrophic_failures": 1.8,
+          "interventions": 22.025,
+          "switches": 4.575,
+          "recovery_debt": 3.1275
+        },
+        "option_switch": {
+          "reward": 8.215624999999989,
+          "success_rate": 0.0,
+          "goals_collected": 2.725,
+          "goals_lost": 4.1,
+          "catastrophic_failures": 4,
+          "interventions": 3.15,
+          "switches": 4.25,
+          "recovery_debt": 2.14
+        },
+        "validity_aware_prototype": {
+          "reward": 7.211249999999999,
+          "success_rate": 0.0,
+          "goals_collected": 1.8,
+          "goals_lost": 4.2,
+          "catastrophic_failures": 1.625,
+          "interventions": 23.025,
+          "switches": 0.95,
+          "recovery_debt": 1.1
+        }
+      }
+    },
+    "metric_health": {
+      "exact_success_rate": 0.0,
+      "exact_success_variance": 0.0,
+      "exact_success_saturated": true,
+      "completion_rate_mean": 0.34241496598639454,
+      "completion_rate_variance": 0.018283405062705354,
+      "completion_has_discrimination": true
+    },
+    "pareto_frontier": [
+      "trace_only",
+      "simplex_representative",
+      "validity_aware_prototype"
+    ]
+  },
+  "ood": {
+    "aggregate": {
+      "trace_only": {
+        "reward": -8.188750000000004,
+        "goals_collected": 1.54,
+        "goals_lost": 6.44,
+        "catastrophic_failures": 6.41,
+        "blocked_actions": 1.68,
+        "partial_actions": 0.08,
+        "interventions": 0,
+        "switches": 0,
+        "trace_match": 1.0,
+        "recovery_debt": 1.706,
+        "max_deviation": 0.26,
+        "success_rate": 0.0
+      },
+      "trace_reactive": {
+        "reward": -8.141750000000004,
+        "goals_collected": 1.52,
+        "goals_lost": 6.46,
+        "catastrophic_failures": 6.51,
+        "blocked_actions": 1.52,
+        "partial_actions": 0.08,
+        "interventions": 0.68,
+        "switches": 0,
+        "trace_match": 0.9902857142857143,
+        "recovery_debt": 1.55,
+        "max_deviation": 0.45,
+        "success_rate": 0.0
+      },
+      "behavior_tree": {
+        "reward": -8.141750000000004,
+        "goals_collected": 1.52,
+        "goals_lost": 6.46,
+        "catastrophic_failures": 6.51,
+        "blocked_actions": 1.52,
+        "partial_actions": 0.08,
+        "interventions": 0.68,
+        "switches": 0,
+        "trace_match": 0.9902857142857143,
+        "recovery_debt": 1.55,
+        "max_deviation": 0.45,
+        "success_rate": 0.0
+      },
+      "plan_monitor_repair": {
+        "reward": -7.516250000000003,
+        "goals_collected": 1.34,
+        "goals_lost": 6.53,
+        "catastrophic_failures": 6.53,
+        "blocked_actions": 0.89,
+        "partial_actions": 0.07,
+        "interventions": 6.84,
+        "switches": 0,
+        "trace_match": 0.9022857142857142,
+        "recovery_debt": 0.917,
+        "max_deviation": 1.36,
+        "success_rate": 0.0
+      },
+      "simplex_representative": {
+        "reward": -3.690750000000003,
+        "goals_collected": 1.25,
+        "goals_lost": 6.52,
+        "catastrophic_failures": 0.98,
+        "blocked_actions": 4.12,
+        "partial_actions": 0.02,
+        "interventions": 40.04,
+        "switches": 1.15,
+        "trace_match": 0.428,
+        "recovery_debt": 4.126,
+        "max_deviation": 1.3,
+        "success_rate": 0.0
+      },
+      "option_switch": {
+        "reward": -8.233000000000004,
+        "goals_collected": 1.53,
+        "goals_lost": 6.46,
+        "catastrophic_failures": 6.46,
+        "blocked_actions": 1.52,
+        "partial_actions": 0.09,
+        "interventions": 0.3,
+        "switches": 0.44,
+        "trace_match": 0.9957142857142858,
+        "recovery_debt": 1.551,
+        "max_deviation": 0.38,
+        "success_rate": 0.0
+      },
+      "validity_aware_prototype": {
+        "reward": 3.7990000000000026,
+        "goals_collected": 1.3,
+        "goals_lost": 6.51,
+        "catastrophic_failures": 1.32,
+        "blocked_actions": 0.03,
+        "partial_actions": 0.06,
+        "interventions": 38.84,
+        "switches": 1,
+        "trace_match": 0.4451428571428571,
+        "recovery_debt": 0.053,
+        "max_deviation": 1.02,
+        "success_rate": 0.0
+      }
+    },
+    "profile_aggregate": {
+      "local": {
+        "trace_only": {
+          "reward": -3.5875000000000017,
+          "success_rate": 0.0,
+          "goals_collected": 1.35,
+          "goals_lost": 6.65,
+          "catastrophic_failures": 6.6,
+          "interventions": 0,
+          "switches": 0,
+          "recovery_debt": 0.515
+        },
+        "trace_reactive": {
+          "reward": -2.9000000000000012,
+          "success_rate": 0.0,
+          "goals_collected": 1.35,
+          "goals_lost": 6.65,
+          "catastrophic_failures": 6.65,
+          "interventions": 1.55,
+          "switches": 0,
+          "recovery_debt": 0.12
+        },
+        "behavior_tree": {
+          "reward": -2.9000000000000012,
+          "success_rate": 0.0,
+          "goals_collected": 1.35,
+          "goals_lost": 6.65,
+          "catastrophic_failures": 6.65,
+          "interventions": 1.55,
+          "switches": 0,
+          "recovery_debt": 0.12
+        },
+        "plan_monitor_repair": {
+          "reward": -2.345000000000001,
+          "success_rate": 0.0,
+          "goals_collected": 1.35,
+          "goals_lost": 6.65,
+          "catastrophic_failures": 6.6,
+          "interventions": 6.65,
+          "switches": 0,
+          "recovery_debt": 0.32
+        },
+        "simplex_representative": {
+          "reward": 4.6299999999999955,
+          "success_rate": 0.0,
+          "goals_collected": 1.25,
+          "goals_lost": 6.75,
+          "catastrophic_failures": 0.2,
+          "interventions": 45.25,
+          "switches": 0.7,
+          "recovery_debt": 0.0
+        },
+        "option_switch": {
+          "reward": -3.7500000000000013,
+          "success_rate": 0.0,
+          "goals_collected": 1.35,
+          "goals_lost": 6.65,
+          "catastrophic_failures": 6.55,
+          "interventions": 0.35,
+          "switches": 0.9,
+          "recovery_debt": 0.615
+        },
+        "validity_aware_prototype": {
+          "reward": 4.174999999999997,
+          "success_rate": 0.0,
+          "goals_collected": 1.35,
+          "goals_lost": 6.65,
+          "catastrophic_failures": 1.25,
+          "interventions": 39,
+          "switches": 1,
+          "recovery_debt": 0.165
+        }
+      },
+      "regime": {
+        "trace_only": {
+          "reward": -13.168750000000008,
+          "success_rate": 0.0,
+          "goals_collected": 1.5,
+          "goals_lost": 6.5,
+          "catastrophic_failures": 6.45,
+          "interventions": 0,
+          "switches": 0,
+          "recovery_debt": 0.02
+        },
+        "trace_reactive": {
+          "reward": -13.181250000000007,
+          "success_rate": 0.0,
+          "goals_collected": 1.5,
+          "goals_lost": 6.5,
+          "catastrophic_failures": 6.5,
+          "interventions": 0.05,
+          "switches": 0,
+          "recovery_debt": 0.02
+        },
+        "behavior_tree": {
+          "reward": -13.181250000000007,
+          "success_rate": 0.0,
+          "goals_collected": 1.5,
+          "goals_lost": 6.5,
+          "catastrophic_failures": 6.5,
+          "interventions": 0.05,
+          "switches": 0,
+          "recovery_debt": 0.02
+        },
+        "plan_monitor_repair": {
+          "reward": -12.248750000000008,
+          "success_rate": 0.0,
+          "goals_collected": 1.35,
+          "goals_lost": 6.65,
+          "catastrophic_failures": 6.65,
+          "interventions": 5.45,
+          "switches": 0,
+          "recovery_debt": 0.02
+        },
+        "simplex_representative": {
+          "reward": 4.829999999999995,
+          "success_rate": 0.0,
+          "goals_collected": 1.25,
+          "goals_lost": 6.75,
+          "catastrophic_failures": 0,
+          "interventions": 46.3,
+          "switches": 0,
+          "recovery_debt": 0.0
+        },
+        "option_switch": {
+          "reward": -13.181250000000007,
+          "success_rate": 0.0,
+          "goals_collected": 1.5,
+          "goals_lost": 6.5,
+          "catastrophic_failures": 6.5,
+          "interventions": 0.05,
+          "switches": 0,
+          "recovery_debt": 0.02
+        },
+        "validity_aware_prototype": {
+          "reward": 4.21,
+          "success_rate": 0.0,
+          "goals_collected": 1.35,
+          "goals_lost": 6.65,
+          "catastrophic_failures": 1.5,
+          "interventions": 37.7,
+          "switches": 1,
+          "recovery_debt": 0.02
+        }
+      },
+      "structural": {
+        "trace_only": {
+          "reward": -8.137500000000005,
+          "success_rate": 0.0,
+          "goals_collected": 1.45,
+          "goals_lost": 6.55,
+          "catastrophic_failures": 6.5,
+          "interventions": 0,
+          "switches": 0,
+          "recovery_debt": 3.72
+        },
+        "trace_reactive": {
+          "reward": -8.150000000000004,
+          "success_rate": 0.0,
+          "goals_collected": 1.45,
+          "goals_lost": 6.55,
+          "catastrophic_failures": 6.55,
+          "interventions": 0.05,
+          "switches": 0,
+          "recovery_debt": 3.72
+        },
+        "behavior_tree": {
+          "reward": -8.150000000000004,
+          "success_rate": 0.0,
+          "goals_collected": 1.45,
+          "goals_lost": 6.55,
+          "catastrophic_failures": 6.55,
+          "interventions": 0.05,
+          "switches": 0,
+          "recovery_debt": 3.72
+        },
+        "plan_monitor_repair": {
+          "reward": -5.447500000000006,
+          "success_rate": 0.0,
+          "goals_collected": 1.35,
+          "goals_lost": 6.65,
+          "catastrophic_failures": 6.25,
+          "interventions": 7.25,
+          "switches": 0,
+          "recovery_debt": 2.22
+        },
+        "simplex_representative": {
+          "reward": -16.852500000000006,
+          "success_rate": 0.0,
+          "goals_collected": 1.25,
+          "goals_lost": 6.7,
+          "catastrophic_failures": 2.35,
+          "interventions": 30.5,
+          "switches": 1.65,
+          "recovery_debt": 10.7
+        },
+        "option_switch": {
+          "reward": -8.150000000000004,
+          "success_rate": 0.0,
+          "goals_collected": 1.45,
+          "goals_lost": 6.55,
+          "catastrophic_failures": 6.55,
+          "interventions": 0.05,
+          "switches": 0,
+          "recovery_debt": 3.72
+        },
+        "validity_aware_prototype": {
+          "reward": 4.21,
+          "success_rate": 0.0,
+          "goals_collected": 1.35,
+          "goals_lost": 6.65,
+          "catastrophic_failures": 1.5,
+          "interventions": 37.7,
+          "switches": 1,
+          "recovery_debt": 0.02
+        }
+      },
+      "adversarial": {
+        "trace_only": {
+          "reward": 0.9875000000000017,
+          "success_rate": 0.0,
+          "goals_collected": 1.75,
+          "goals_lost": 6.25,
+          "catastrophic_failures": 6.2,
+          "interventions": 0,
+          "switches": 0,
+          "recovery_debt": 0.05
+        },
+        "trace_reactive": {
+          "reward": 0.41750000000000137,
+          "success_rate": 0.0,
+          "goals_collected": 1.7,
+          "goals_lost": 6.3,
+          "catastrophic_failures": 6.4,
+          "interventions": 0.15,
+          "switches": 0,
+          "recovery_debt": 0.05500000000000001
+        },
+        "behavior_tree": {
+          "reward": 0.41750000000000137,
+          "success_rate": 0.0,
+          "goals_collected": 1.7,
+          "goals_lost": 6.3,
+          "catastrophic_failures": 6.4,
+          "interventions": 0.15,
+          "switches": 0,
+          "recovery_debt": 0.05500000000000001
+        },
+        "plan_monitor_repair": {
+          "reward": -2.792499999999996,
+          "success_rate": 0.0,
+          "goals_collected": 1.3,
+          "goals_lost": 6.35,
+          "catastrophic_failures": 6.75,
+          "interventions": 6,
+          "switches": 0,
+          "recovery_debt": 0.04
+        },
+        "simplex_representative": {
+          "reward": 4.295000000000004,
+          "success_rate": 0.0,
+          "goals_collected": 1.2,
+          "goals_lost": 6.2,
+          "catastrophic_failures": 0.05,
+          "interventions": 47.1,
+          "switches": 0.1,
+          "recovery_debt": 0.015000000000000003
+        },
+        "option_switch": {
+          "reward": 0.41750000000000137,
+          "success_rate": 0.0,
+          "goals_collected": 1.7,
+          "goals_lost": 6.3,
+          "catastrophic_failures": 6.4,
+          "interventions": 0.15,
+          "switches": 0,
+          "recovery_debt": 0.05500000000000001
+        },
+        "validity_aware_prototype": {
+          "reward": 2.8475000000000126,
+          "success_rate": 0.0,
+          "goals_collected": 1.2,
+          "goals_lost": 6.3,
+          "catastrophic_failures": 1.4,
+          "interventions": 38.7,
+          "switches": 1,
+          "recovery_debt": 0.02
+        }
+      },
+      "mixed": {
+        "trace_only": {
+          "reward": -17.03750000000001,
+          "success_rate": 0.0,
+          "goals_collected": 1.65,
+          "goals_lost": 6.25,
+          "catastrophic_failures": 6.3,
+          "interventions": 0,
+          "switches": 0,
+          "recovery_debt": 4.225
+        },
+        "trace_reactive": {
+          "reward": -16.895000000000007,
+          "success_rate": 0.0,
+          "goals_collected": 1.6,
+          "goals_lost": 6.3,
+          "catastrophic_failures": 6.45,
+          "interventions": 1.6,
+          "switches": 0,
+          "recovery_debt": 3.835
+        },
+        "behavior_tree": {
+          "reward": -16.895000000000007,
+          "success_rate": 0.0,
+          "goals_collected": 1.6,
+          "goals_lost": 6.3,
+          "catastrophic_failures": 6.45,
+          "interventions": 1.6,
+          "switches": 0,
+          "recovery_debt": 3.835
+        },
+        "plan_monitor_repair": {
+          "reward": -14.747500000000004,
+          "success_rate": 0.0,
+          "goals_collected": 1.35,
+          "goals_lost": 6.35,
+          "catastrophic_failures": 6.4,
+          "interventions": 8.85,
+          "switches": 0,
+          "recovery_debt": 1.985
+        },
+        "simplex_representative": {
+          "reward": -15.356250000000003,
+          "success_rate": 0.0,
+          "goals_collected": 1.3,
+          "goals_lost": 6.2,
+          "catastrophic_failures": 2.3,
+          "interventions": 31.05,
+          "switches": 3.3,
+          "recovery_debt": 9.915
+        },
+        "option_switch": {
+          "reward": -16.501250000000006,
+          "success_rate": 0.0,
+          "goals_collected": 1.65,
+          "goals_lost": 6.3,
+          "catastrophic_failures": 6.3,
+          "interventions": 0.9,
+          "switches": 1.3,
+          "recovery_debt": 3.345
+        },
+        "validity_aware_prototype": {
+          "reward": 3.5525000000000038,
+          "success_rate": 0.0,
+          "goals_collected": 1.25,
+          "goals_lost": 6.3,
+          "catastrophic_failures": 0.95,
+          "interventions": 41.1,
+          "switches": 1,
+          "recovery_debt": 0.04
+        }
+      }
+    },
+    "metric_health": {
+      "exact_success_rate": 0.0,
+      "exact_success_variance": 0.0,
+      "exact_success_saturated": true,
+      "completion_rate_mean": 0.18074319727891155,
+      "completion_rate_variance": 0.013554404330950067,
+      "completion_has_discrimination": true
+    },
+    "pareto_frontier": [
+      "trace_only",
+      "trace_reactive",
+      "behavior_tree",
+      "plan_monitor_repair",
+      "simplex_representative",
+      "validity_aware_prototype"
+    ]
+  },
+  "generalization": {
+    "trace_only": {
+      "reward_delta_ood_minus_in": -17.037499999999994,
+      "reward_symmetric_change": -1.0,
+      "reward_sign_changed": true,
+      "success_delta": 0.0
+    },
+    "trace_reactive": {
+      "reward_delta_ood_minus_in": -16.403624999999995,
+      "reward_symmetric_change": -1.0,
+      "reward_sign_changed": true,
+      "success_delta": 0.0
+    },
+    "behavior_tree": {
+      "reward_delta_ood_minus_in": -16.333624999999994,
+      "reward_symmetric_change": -1.0,
+      "reward_sign_changed": true,
+      "success_delta": 0.0
+    },
+    "plan_monitor_repair": {
+      "reward_delta_ood_minus_in": -12.713374999999997,
+      "reward_symmetric_change": -1.0,
+      "reward_sign_changed": true,
+      "success_delta": 0.0
+    },
+    "simplex_representative": {
+      "reward_delta_ood_minus_in": -17.772999999999968,
+      "reward_symmetric_change": -1.0,
+      "reward_sign_changed": true,
+      "success_delta": 0.0
+    },
+    "option_switch": {
+      "reward_delta_ood_minus_in": -16.951124999999994,
+      "reward_symmetric_change": -1.0,
+      "reward_sign_changed": true,
+      "success_delta": 0.0
+    },
+    "validity_aware_prototype": {
+      "reward_delta_ood_minus_in": -6.929624999999989,
+      "reward_symmetric_change": -0.4769964120081563,
+      "reward_sign_changed": false,
+      "success_delta": 0.0
+    }
+  }
+}

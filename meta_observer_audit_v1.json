@@ -1,0 +1,272 @@
+{
+  "experiments": [
+    {
+      "name": "v0.3 stress / causal fork",
+      "question_explicit": true,
+      "oracle_separated": true,
+      "causal_alignment": true,
+      "label_validated": false,
+      "class_balance_checked": true,
+      "pooled_metric_risk_checked": false,
+      "leakage_checked": true,
+      "train_test_separation": false,
+      "hidden_confounds_found": [
+        "event timing initially misaligned",
+        "observability had not yet been causal",
+        "magnitude initially partly nominal"
+      ],
+      "corrections_applied": [
+        "event-aligned forks",
+        "causal observability",
+        "parameter validity checks"
+      ],
+      "result_status": "EXPERIMENTALLY_SUPPORTED_LIMITED",
+      "decision": "do not claim architecture superiority",
+      "confidence": "medium",
+      "notes": "Useful world stress test; not yet a definitive architecture comparison."
+    },
+    {
+      "name": "v0.4 oracle / validity",
+      "question_explicit": true,
+      "oracle_separated": true,
+      "causal_alignment": true,
+      "label_validated": true,
+      "class_balance_checked": true,
+      "pooled_metric_risk_checked": true,
+      "leakage_checked": true,
+      "train_test_separation": true,
+      "hidden_confounds_found": [
+        "absolute invalidity can precede perturbation",
+        "one-step oracle misses delayed effects"
+      ],
+      "corrections_applied": [
+        "matched clean-vs-perturbed worlds",
+        "rollout oracle"
+      ],
+      "result_status": "EXPERIMENTALLY_SUPPORTED_LIMITED",
+      "decision": "use causal validity rather than raw invalidity",
+      "confidence": "medium",
+      "notes": "Oracle became an explicit research object."
+    },
+    {
+      "name": "v0.5 validity curves",
+      "question_explicit": true,
+      "oracle_separated": true,
+      "causal_alignment": true,
+      "label_validated": true,
+      "class_balance_checked": true,
+      "pooled_metric_risk_checked": true,
+      "leakage_checked": true,
+      "train_test_separation": true,
+      "hidden_confounds_found": [
+        "structural/adversarial effects initially too weak"
+      ],
+      "corrections_applied": [
+        "stronger perturbations",
+        "horizon-dependent validity"
+      ],
+      "result_status": "EXPERIMENTALLY_SUPPORTED_LIMITED",
+      "decision": "do not equate validity with global optimality",
+      "confidence": "medium",
+      "notes": "Horizon dependence established in this simulator."
+    },
+    {
+      "name": "v0.6 BOCPD",
+      "question_explicit": true,
+      "oracle_separated": true,
+      "causal_alignment": true,
+      "label_validated": true,
+      "class_balance_checked": true,
+      "pooled_metric_risk_checked": true,
+      "leakage_checked": true,
+      "train_test_separation": true,
+      "hidden_confounds_found": [
+        "predictive branch bug made change probability collapse to hazard",
+        "single scalar signal insufficient"
+      ],
+      "corrections_applied": [
+        "prior-predictive change branch",
+        "feature ablation"
+      ],
+      "result_status": "CONTRADICTED_SIMPLE_HYPOTHESIS",
+      "decision": "do not connect BOCPD to control yet",
+      "confidence": "high",
+      "notes": "The negative result is one of the stronger methodological findings."
+    },
+    {
+      "name": "v0.7 belief + BOCPD",
+      "question_explicit": true,
+      "oracle_separated": true,
+      "causal_alignment": true,
+      "label_validated": true,
+      "class_balance_checked": true,
+      "pooled_metric_risk_checked": true,
+      "leakage_checked": true,
+      "train_test_separation": true,
+      "hidden_confounds_found": [
+        "current observable feature set insufficient",
+        "high false-alarm rates"
+      ],
+      "corrections_applied": [
+        "explicit belief layer"
+      ],
+      "result_status": "CONTRADICTED_SIMPLE_HYPOTHESIS",
+      "decision": "build richer state representation",
+      "confidence": "high",
+      "notes": "Combining shallow features did not solve detection."
+    },
+    {
+      "name": "v0.8 dynamics",
+      "question_explicit": true,
+      "oracle_separated": true,
+      "causal_alignment": true,
+      "label_validated": true,
+      "class_balance_checked": true,
+      "pooled_metric_risk_checked": true,
+      "leakage_checked": true,
+      "train_test_separation": true,
+      "hidden_confounds_found": [
+        "structural scenario weak",
+        "instantaneous residuals can be transient"
+      ],
+      "corrections_applied": [
+        "stronger structural event",
+        "persistent residuals"
+      ],
+      "result_status": "EXPERIMENTALLY_SUPPORTED_LIMITED",
+      "decision": "use dynamics as fast signal candidate only",
+      "confidence": "medium",
+      "notes": "Profile-dependent signal heterogeneity became explicit."
+    },
+    {
+      "name": "v0.9 reachability",
+      "question_explicit": true,
+      "oracle_separated": true,
+      "causal_alignment": true,
+      "label_validated": true,
+      "class_balance_checked": true,
+      "pooled_metric_risk_checked": true,
+      "leakage_checked": true,
+      "train_test_separation": true,
+      "hidden_confounds_found": [
+        "clean objective could already be lost",
+        "regime has few eligible windows",
+        "accuracy could be imbalanced"
+      ],
+      "corrections_applied": [
+        "objective conditioning",
+        "Brier/calibration over accuracy"
+      ],
+      "result_status": "PRELIMINARY_SUPPORT",
+      "decision": "do not call reachability calibrated/general yet",
+      "confidence": "medium-low",
+      "notes": "Promising but still setup-dependent."
+    },
+    {
+      "name": "signal selection event-point v1",
+      "question_explicit": true,
+      "oracle_separated": true,
+      "causal_alignment": true,
+      "label_validated": true,
+      "class_balance_checked": true,
+      "pooled_metric_risk_checked": true,
+      "leakage_checked": true,
+      "train_test_separation": true,
+      "hidden_confounds_found": [
+        "pooled target imbalance",
+        "profile dominance",
+        "shallow rollout approximation"
+      ],
+      "corrections_applied": [
+        "explicit limitations",
+        "per-profile follow-up requirement"
+      ],
+      "result_status": "PRELIMINARY_SUPPORT",
+      "decision": "dynamics residual is a candidate, not final signal",
+      "confidence": "medium-low",
+      "notes": "Best single event-point discriminator in the tested pooled setup."
+    },
+    {
+      "name": "temporal confirmatory v1",
+      "question_explicit": true,
+      "oracle_separated": true,
+      "causal_alignment": false,
+      "label_validated": false,
+      "class_balance_checked": true,
+      "pooled_metric_risk_checked": true,
+      "leakage_checked": true,
+      "train_test_separation": true,
+      "hidden_confounds_found": [
+        "held-out local had zero positives",
+        "structural had near-zero positives",
+        "run timed out before completion"
+      ],
+      "corrections_applied": [
+        "switched to continuous temporal association on a reduced sample"
+      ],
+      "result_status": "INCONCLUSIVE",
+      "decision": "no detector ranking claim",
+      "confidence": "low",
+      "notes": "The binary temporal protocol is underpowered for several profiles."
+    },
+    {
+      "name": "temporal association small v1",
+      "question_explicit": true,
+      "oracle_separated": true,
+      "causal_alignment": true,
+      "label_validated": true,
+      "class_balance_checked": true,
+      "pooled_metric_risk_checked": true,
+      "leakage_checked": true,
+      "train_test_separation": true,
+      "hidden_confounds_found": [
+        "very small per-profile n=4",
+        "pooled associations near zero due heterogeneity/sign cancellation"
+      ],
+      "corrections_applied": [
+        "continuous delta-gap target",
+        "profile/time slice inspection"
+      ],
+      "result_status": "INCONCLUSIVE",
+      "decision": "do not select a final signal from pooled correlation",
+      "confidence": "low",
+      "notes": "This run is diagnostic, not confirmatory."
+    }
+  ],
+  "future_rules": [
+    "Never trust pooled metrics when profile heterogeneity is plausible; require per-profile results.",
+    "Before running a large experiment, validate that the label has sufficient support in every intended evaluation slice.",
+    "Treat the oracle as a model with assumptions; test oracle sensitivity to horizon/beam and report it.",
+    "Keep latent truth strictly out of online features and detector inputs; audit leakage explicitly.",
+    "Verify every parameter is causal before sweeping it; nominal knobs are prohibited from supporting claims.",
+    "Separate event onset, delayed consequence, and task-level invalidity; do not use one label for all three.",
+    "Use paired counterfactuals whenever comparing perturbation effects.",
+    "Require train/test separation whenever a learned threshold, calibration model, or predictor is fitted.",
+    "Report class prevalence and minimum positive/negative counts before AUROC/AUPRC claims.",
+    "Do not use accuracy as primary evidence under imbalance; include Brier/ECE and prevalence-aware metrics.",
+    "When an experiment times out, treat it as a harness finding, not as missing data to silently discard.",
+    "Every new architecture claim must state whether it is implementation-correctness, empirical performance, or generalization.",
+    "Maintain a hypothesis ledger: successful tests do not upgrade an open hypothesis unless a discriminating comparison was completed.",
+    "Add a pre-flight audit before each expensive sweep and a post-run meta-audit before interpretation."
+  ],
+  "decision_rules": {
+    "architecture_change_requires": [
+      "causal evidence or strong comparative evidence",
+      "reproducible test",
+      "no unresolved leakage/confound"
+    ],
+    "detector_admission_requires": [
+      "signal is available online",
+      "held-out evaluation",
+      "per-profile stability",
+      "timing measured",
+      "false alarms measured"
+    ],
+    "controller_admission_requires": [
+      "detector validated",
+      "action effect validated",
+      "paired counterfactual comparison against baseline",
+      "safety/constraint checks"
+    ]
+  }
+}

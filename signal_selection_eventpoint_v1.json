@@ -1,0 +1,162 @@
+{
+  "n_train": 120,
+  "n_test": 80,
+  "train_positive_rate": 0.2833333333333333,
+  "test_positive_rate": 0.2,
+  "models": {
+    "reward_residual": {
+      "auroc": 0.5,
+      "auprc": 0.2,
+      "brier": 0.25,
+      "ece": 0.3,
+      "corr": null,
+      "mse": 0.12524652777777776,
+      "mean_pred": 0.14166666666666664,
+      "mean_true": 0.104375
+    },
+    "dynamics_residual": {
+      "auroc": 0.671875,
+      "auprc": 0.40625,
+      "brier": 0.2443630560159198,
+      "ece": 0.33997873183056304,
+      "corr": 0.3303198579113608,
+      "mse": 0.11714727726655294,
+      "mean_pred": 0.14538939766212494,
+      "mean_true": 0.104375
+    },
+    "trace_deviation": {
+      "auroc": 0.5,
+      "auprc": 0.2,
+      "brier": 0.25,
+      "ece": 0.3,
+      "corr": null,
+      "mse": 0.12524652777777776,
+      "mean_pred": 0.14166666666666664,
+      "mean_true": 0.104375
+    },
+    "objective_reachability": {
+      "auroc": 0.552734375,
+      "auprc": 0.21836626676195325,
+      "brier": 0.2496247940495095,
+      "ece": 0.29935267620243644,
+      "corr": 0.12433787119036767,
+      "mse": 0.12410004589329823,
+      "mean_pred": 0.14578479490100915,
+      "mean_true": 0.104375
+    },
+    "combined": {
+      "auroc": 0.650390625,
+      "auprc": 0.4836086593712798,
+      "brier": 0.24433459460314527,
+      "ece": 0.3399278374790317,
+      "corr": 0.36381309648024845,
+      "mse": 0.11378051597098063
+    }
+  },
+  "by_profile": {
+    "local": {
+      "reward_residual": {
+        "corr": null,
+        "mse": 0.28172499999999995,
+        "mean_pred": 0.185,
+        "mean_true": 0.1125
+      },
+      "dynamics_residual": {
+        "corr": null,
+        "mse": 0.2837427960882584,
+        "mean_pred": 0.19778801843317967,
+        "mean_true": 0.1125
+      },
+      "trace_deviation": {
+        "corr": null,
+        "mse": 0.28172499999999995,
+        "mean_pred": 0.185,
+        "mean_true": 0.1125
+      },
+      "objective_reachability": {
+        "corr": 0.3293463951700616,
+        "mse": 0.24907556558837163,
+        "mean_pred": 0.15749190552111142,
+        "mean_true": 0.1125
+      }
+    },
+    "regime": {
+      "reward_residual": {
+        "corr": null,
+        "mse": 0.036249999999999984,
+        "mean_pred": 0.275,
+        "mean_true": 0.22499999999999995
+      },
+      "dynamics_residual": {
+        "corr": -0.4714045207910314,
+        "mse": 0.043211132609261155,
+        "mean_pred": 0.258366935483871,
+        "mean_true": 0.22499999999999995
+      },
+      "trace_deviation": {
+        "corr": null,
+        "mse": 0.036249999999999984,
+        "mean_pred": 0.275,
+        "mean_true": 0.22499999999999995
+      },
+      "objective_reachability": {
+        "corr": -0.16689352602545024,
+        "mse": 0.047347353655547,
+        "mean_pred": 0.3155161837658664,
+        "mean_true": 0.22499999999999995
+      }
+    },
+    "structural": {
+      "reward_residual": {
+        "corr": null,
+        "mse": 0.14831944444444442,
+        "mean_pred": 0.058333333333333334,
+        "mean_true": 0.07999999999999999
+      },
+      "dynamics_residual": {
+        "corr": 0.6891840367099833,
+        "mse": 0.07786155928725984,
+        "mean_pred": 0.08915130568356375,
+        "mean_true": 0.07999999999999999
+      },
+      "trace_deviation": {
+        "corr": null,
+        "mse": 0.14831944444444442,
+        "mean_pred": 0.058333333333333334,
+        "mean_true": 0.07999999999999999
+      },
+      "objective_reachability": {
+        "corr": 0.03293481617824823,
+        "mse": 0.15465995939272278,
+        "mean_pred": 0.06317931935734702,
+        "mean_true": 0.07999999999999999
+      }
+    },
+    "adversarial": {
+      "reward_residual": {
+        "corr": null,
+        "mse": 0.013586111111111137,
+        "mean_pred": 0.048333333333333374,
+        "mean_true": 4.4408920985006264e-17
+      },
+      "dynamics_residual": {
+        "corr": -7.728303611692256e-17,
+        "mse": 0.01347502890507576,
+        "mean_pred": 0.046451612903225845,
+        "mean_true": 4.4408920985006264e-17
+      },
+      "trace_deviation": {
+        "corr": null,
+        "mse": 0.013586111111111137,
+        "mean_pred": 0.048333333333333374,
+        "mean_true": 4.4408920985006264e-17
+      },
+      "objective_reachability": {
+        "corr": 0.1552376681712977,
+        "mse": 0.013915842628973366,
+        "mean_pred": 0.054160447349759964,
+        "mean_true": 4.4408920985006264e-17
+      }
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "local": {
+    "n_test": 188,
+    "positive_rate": 0.8138297872340425,
+    "baseline_brier": 0.1515108646446356,
+    "model_brier": 0.09597459288428233,
+    "brier_skill": 0.3665497645374277,
+    "ece": 0.0854360307020769
+  },
+  "regime": {
+    "n_test": 188,
+    "positive_rate": 0.8138297872340425,
+    "baseline_brier": 0.1515108646446356,
+    "model_brier": 0.09328968461257292,
+    "brier_skill": 0.3842706605141406,
+    "ece": 0.06659685088366553
+  },
+  "structural": {
+    "n_test": 188,
+    "positive_rate": 0.8138297872340425,
+    "baseline_brier": 0.1515108646446356,
+    "model_brier": 0.09962403894626612,
+    "brier_skill": 0.34246273902580215,
+    "ece": 0.055788996509526165
+  },
+  "adversarial": {
+    "n_test": 233,
+    "positive_rate": 0.6351931330472103,
+    "baseline_brier": 0.2317228167768793,
+    "model_brier": 0.1541724604824643,
+    "brier_skill": 0.3346686242343002,
+    "ece": 0.12258868459421257
+  }
+}

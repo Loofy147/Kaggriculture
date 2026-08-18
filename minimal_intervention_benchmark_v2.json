@@ -1,0 +1,700 @@
+{
+  "protocol": {
+    "id_scenarios": 150,
+    "ood_scenarios": 75,
+    "profiles": [
+      "local",
+      "regime",
+      "structural",
+      "adversarial",
+      "mixed"
+    ],
+    "same_world_paired": true,
+    "objective_metrics": [
+      "objective_completion",
+      "progress_score"
+    ],
+    "minimal_intervention_definition": "lowest-cost feasible change from reference; switch only on strong local evidence",
+    "baseline_note": "Representative architecture baselines, not claim-equivalent reimplementations of cited papers."
+  },
+  "id": {
+    "aggregate": {
+      "trace_only": {
+        "reward": 8.457499999999989,
+        "progress_score": -0.11333333333333333,
+        "objective_completion": 0.3609523809523809,
+        "catastrophe_rate": 0.07455555555555556,
+        "blocked_actions": 1.4933333333333334,
+        "intervention_steps": 0,
+        "intervention_rate": 0.0,
+        "intervention_cost": 0.0,
+        "trace_match_rate": 1.0,
+        "recovery_debt": 5.954666666666666,
+        "mean_trace_deviation": 0.024888888888888887,
+        "switches": 0,
+        "repairs": 0,
+        "n": 150
+      },
+      "trace_reactive": {
+        "reward": 8.029999999999989,
+        "progress_score": -0.12785714285714286,
+        "objective_completion": 0.3514285714285714,
+        "catastrophe_rate": 0.07755555555555556,
+        "blocked_actions": 1.38,
+        "intervention_steps": 0.37333333333333335,
+        "intervention_rate": 0.006222222222222222,
+        "intervention_cost": 0.024333333333333335,
+        "trace_match_rate": 0.9937777777777778,
+        "recovery_debt": 6.018,
+        "mean_trace_deviation": 0.027777777777777776,
+        "switches": 0,
+        "repairs": 0,
+        "n": 150
+      },
+      "behavior_tree": {
+        "reward": 7.936666666666656,
+        "progress_score": -0.1280952380952381,
+        "objective_completion": 0.35047619047619044,
+        "catastrophe_rate": 0.07955555555555556,
+        "blocked_actions": 1.38,
+        "intervention_steps": 0.4866666666666667,
+        "intervention_rate": 0.00811111111111111,
+        "intervention_cost": 0.035666666666666666,
+        "trace_match_rate": 0.9918888888888889,
+        "recovery_debt": 6.14,
+        "mean_trace_deviation": 0.02822222222222222,
+        "switches": 0,
+        "repairs": 0,
+        "n": 150
+      },
+      "plan_monitor_repair": {
+        "reward": 4.578999999999993,
+        "progress_score": -0.19333333333333333,
+        "objective_completion": 0.3009523809523809,
+        "catastrophe_rate": 0.07955555555555556,
+        "blocked_actions": 1.62,
+        "intervention_steps": 5.406666666666666,
+        "intervention_rate": 0.09011111111111111,
+        "intervention_cost": 0.2090666666666667,
+        "trace_match_rate": 0.9098888888888889,
+        "recovery_debt": 6.406666666666666,
+        "mean_trace_deviation": 0.10222222222222223,
+        "switches": 0,
+        "repairs": 0,
+        "n": 150
+      },
+      "simplex_representative": {
+        "reward": 13.792999999999966,
+        "progress_score": -0.09238095238095238,
+        "objective_completion": 0.3619047619047619,
+        "catastrophe_rate": 0.015333333333333334,
+        "blocked_actions": 1.6,
+        "intervention_steps": 28.833333333333332,
+        "intervention_rate": 0.48055555555555557,
+        "intervention_cost": 1.0264666666666673,
+        "trace_match_rate": 0.5194444444444445,
+        "recovery_debt": 2.566,
+        "mean_trace_deviation": 0.442,
+        "switches": 1.8266666666666667,
+        "repairs": 0,
+        "n": 150
+      },
+      "option_switch": {
+        "reward": 8.579166666666655,
+        "progress_score": -0.11928571428571429,
+        "objective_completion": 0.3571428571428571,
+        "catastrophe_rate": 0.07477777777777778,
+        "blocked_actions": 1.2666666666666666,
+        "intervention_steps": 1.0133333333333334,
+        "intervention_rate": 0.016888888888888887,
+        "intervention_cost": 0.06066666666666667,
+        "trace_match_rate": 0.9831111111111112,
+        "recovery_debt": 5.738666666666667,
+        "mean_trace_deviation": 0.04111111111111111,
+        "switches": 1.4266666666666667,
+        "repairs": 0,
+        "n": 150
+      },
+      "trace_change_aware": {
+        "reward": 8.029999999999989,
+        "progress_score": -0.12785714285714286,
+        "objective_completion": 0.3514285714285714,
+        "catastrophe_rate": 0.07755555555555556,
+        "blocked_actions": 1.38,
+        "intervention_steps": 0.37333333333333335,
+        "intervention_rate": 0.006222222222222222,
+        "intervention_cost": 0.024333333333333335,
+        "trace_match_rate": 0.9937777777777778,
+        "recovery_debt": 6.018,
+        "mean_trace_deviation": 0.027777777777777776,
+        "switches": 0,
+        "repairs": 0,
+        "n": 150
+      },
+      "trace_triggered_replan": {
+        "reward": 8.366333333333323,
+        "progress_score": -0.18666666666666668,
+        "objective_completion": 0.30476190476190473,
+        "catastrophe_rate": 0.06188888888888889,
+        "blocked_actions": 0.44,
+        "intervention_steps": 10.82,
+        "intervention_rate": 0.18033333333333335,
+        "intervention_cost": 0.37720000000000015,
+        "trace_match_rate": 0.8196666666666667,
+        "recovery_debt": 4.164666666666666,
+        "mean_trace_deviation": 0.17322222222222222,
+        "switches": 0,
+        "repairs": 0,
+        "n": 150
+      },
+      "trace_replan": {
+        "reward": 17.963666666666626,
+        "progress_score": -0.08095238095238096,
+        "objective_completion": 0.3676190476190476,
+        "catastrophe_rate": 0.0025555555555555557,
+        "blocked_actions": 0,
+        "intervention_steps": 33.653333333333336,
+        "intervention_rate": 0.5608888888888889,
+        "intervention_cost": 1.1800666666666673,
+        "trace_match_rate": 0.4391111111111111,
+        "recovery_debt": 0.19599999999999998,
+        "mean_trace_deviation": 0.4713333333333333,
+        "switches": 0,
+        "repairs": 0,
+        "n": 150
+      },
+      "minimal_intervention": {
+        "reward": 6.90699999999999,
+        "progress_score": -0.15047619047619049,
+        "objective_completion": 0.3352380952380952,
+        "catastrophe_rate": 0.07944444444444444,
+        "blocked_actions": 1.34,
+        "intervention_steps": 1.36,
+        "intervention_rate": 0.022666666666666665,
+        "intervention_cost": 0.07366666666666667,
+        "trace_match_rate": 0.9773333333333333,
+        "recovery_debt": 6.102666666666667,
+        "mean_trace_deviation": 0.04811111111111111,
+        "switches": 0.9933333333333333,
+        "repairs": 0.36666666666666664,
+        "n": 150
+      }
+    },
+    "metric_health": {
+      "objective_completion_variance": 0.02060774603174603,
+      "progress_score_variance": 0.06071342120181406,
+      "objective_completion_discriminative": true,
+      "progress_score_discriminative": true
+    },
+    "pareto_frontier": [
+      "trace_only",
+      "simplex_representative",
+      "option_switch",
+      "trace_triggered_replan",
+      "trace_replan"
+    ]
+  },
+  "ood": {
+    "aggregate": {
+      "trace_only": {
+        "reward": -7.399999999999999,
+        "progress_score": -0.3333333333333333,
+        "objective_completion": 0.23666666666666666,
+        "catastrophe_rate": 0.08628571428571429,
+        "blocked_actions": 1.68,
+        "intervention_steps": 0,
+        "intervention_rate": 0.0,
+        "intervention_cost": 0.0,
+        "trace_match_rate": 1.0,
+        "recovery_debt": 7.782666666666667,
+        "mean_trace_deviation": 0.024,
+        "switches": 0,
+        "repairs": 0,
+        "n": 75
+      },
+      "trace_reactive": {
+        "reward": -8.003333333333332,
+        "progress_score": -0.34833333333333333,
+        "objective_completion": 0.22666666666666666,
+        "catastrophe_rate": 0.09123809523809524,
+        "blocked_actions": 1.5066666666666666,
+        "intervention_steps": 0.84,
+        "intervention_rate": 0.012,
+        "intervention_cost": 0.05533333333333334,
+        "trace_match_rate": 0.988,
+        "recovery_debt": 7.964,
+        "mean_trace_deviation": 0.028,
+        "switches": 0,
+        "repairs": 0,
+        "n": 75
+      },
+      "behavior_tree": {
+        "reward": -7.997333333333332,
+        "progress_score": -0.34833333333333333,
+        "objective_completion": 0.22666666666666666,
+        "catastrophe_rate": 0.09142857142857143,
+        "blocked_actions": 1.5066666666666666,
+        "intervention_steps": 0.8533333333333334,
+        "intervention_rate": 0.01219047619047619,
+        "intervention_cost": 0.05666666666666667,
+        "trace_match_rate": 0.9878095238095238,
+        "recovery_debt": 7.977333333333333,
+        "mean_trace_deviation": 0.028,
+        "switches": 0,
+        "repairs": 0,
+        "n": 75
+      },
+      "plan_monitor_repair": {
+        "reward": -7.255333333333332,
+        "progress_score": -0.3770833333333333,
+        "objective_completion": 0.20166666666666666,
+        "catastrophe_rate": 0.0921904761904762,
+        "blocked_actions": 0.68,
+        "intervention_steps": 6.973333333333334,
+        "intervention_rate": 0.09961904761904762,
+        "intervention_cost": 0.23826666666666668,
+        "trace_match_rate": 0.9003809523809524,
+        "recovery_debt": 7.224,
+        "mean_trace_deviation": 0.11104761904761905,
+        "switches": 0,
+        "repairs": 0,
+        "n": 75
+      },
+      "simplex_representative": {
+        "reward": 0.38333333333332803,
+        "progress_score": -0.40458333333333335,
+        "objective_completion": 0.17166666666666666,
+        "catastrophe_rate": 0.008761904761904762,
+        "blocked_actions": 2.466666666666667,
+        "intervention_steps": 47.373333333333335,
+        "intervention_rate": 0.6767619047619048,
+        "intervention_cost": 1.4746666666666677,
+        "trace_match_rate": 0.3232380952380952,
+        "recovery_debt": 3.1466666666666665,
+        "mean_trace_deviation": 0.6171428571428571,
+        "switches": 1.0533333333333332,
+        "repairs": 0,
+        "n": 75
+      },
+      "option_switch": {
+        "reward": -7.666666666666666,
+        "progress_score": -0.345,
+        "objective_completion": 0.23,
+        "catastrophe_rate": 0.09028571428571429,
+        "blocked_actions": 1.32,
+        "intervention_steps": 0.37333333333333335,
+        "intervention_rate": 0.005333333333333333,
+        "intervention_cost": 0.032,
+        "trace_match_rate": 0.9946666666666667,
+        "recovery_debt": 7.708,
+        "mean_trace_deviation": 0.02438095238095238,
+        "switches": 0.26666666666666666,
+        "repairs": 0,
+        "n": 75
+      },
+      "trace_change_aware": {
+        "reward": -8.003333333333332,
+        "progress_score": -0.34833333333333333,
+        "objective_completion": 0.22666666666666666,
+        "catastrophe_rate": 0.09123809523809524,
+        "blocked_actions": 1.5066666666666666,
+        "intervention_steps": 0.84,
+        "intervention_rate": 0.012,
+        "intervention_cost": 0.05533333333333334,
+        "trace_match_rate": 0.988,
+        "recovery_debt": 7.964,
+        "mean_trace_deviation": 0.028,
+        "switches": 0,
+        "repairs": 0,
+        "n": 75
+      },
+      "trace_triggered_replan": {
+        "reward": -3.9513333333333303,
+        "progress_score": -0.37875,
+        "objective_completion": 0.2,
+        "catastrophe_rate": 0.07885714285714286,
+        "blocked_actions": 0.13333333333333333,
+        "intervention_steps": 12.666666666666666,
+        "intervention_rate": 0.18095238095238095,
+        "intervention_cost": 0.40853333333333347,
+        "trace_match_rate": 0.819047619047619,
+        "recovery_debt": 5.745333333333334,
+        "mean_trace_deviation": 0.1699047619047619,
+        "switches": 0,
+        "repairs": 0,
+        "n": 75
+      },
+      "trace_replan": {
+        "reward": 5.501333333333329,
+        "progress_score": -0.40166666666666667,
+        "objective_completion": 0.17333333333333334,
+        "catastrophe_rate": 0.0026666666666666666,
+        "blocked_actions": 0,
+        "intervention_steps": 51.12,
+        "intervention_rate": 0.7302857142857143,
+        "intervention_cost": 1.5882666666666678,
+        "trace_match_rate": 0.26971428571428574,
+        "recovery_debt": 0.2533333333333333,
+        "mean_trace_deviation": 0.6230476190476191,
+        "switches": 0,
+        "repairs": 0,
+        "n": 75
+      },
+      "minimal_intervention": {
+        "reward": -8.040666666666665,
+        "progress_score": -0.34833333333333333,
+        "objective_completion": 0.22666666666666666,
+        "catastrophe_rate": 0.09123809523809524,
+        "blocked_actions": 1.5333333333333334,
+        "intervention_steps": 0.9866666666666667,
+        "intervention_rate": 0.014095238095238095,
+        "intervention_cost": 0.06266666666666668,
+        "trace_match_rate": 0.985904761904762,
+        "recovery_debt": 7.990666666666667,
+        "mean_trace_deviation": 0.03142857142857143,
+        "switches": 0.14666666666666667,
+        "repairs": 0.84,
+        "n": 75
+      }
+    },
+    "metric_health": {
+      "objective_completion_variance": 0.014472666666666667,
+      "progress_score_variance": 0.042738557291666666,
+      "objective_completion_discriminative": true,
+      "progress_score_discriminative": true
+    },
+    "pareto_frontier": [
+      "trace_only",
+      "plan_monitor_repair",
+      "simplex_representative",
+      "trace_triggered_replan",
+      "trace_replan"
+    ]
+  },
+  "paired_vs_minimal": {
+    "trace_only": {
+      "id_reward": {
+        "n": 150,
+        "mean": -1.5504999999999987,
+        "sd": 6.006564830004494,
+        "ci95_low": -2.5117505707766004,
+        "ci95_high": -0.5892494292233968
+      },
+      "id_progress": {
+        "n": 150,
+        "mean": -0.037142857142857144,
+        "sd": 0.11614322213634583,
+        "ci95_low": -0.055729643722219266,
+        "ci95_high": -0.01855607056349502
+      },
+      "id_intervention_cost": {
+        "n": 150,
+        "mean": 0.07366666666666667,
+        "sd": 0.08103704237653583,
+        "ci95_low": 0.060698038932995066,
+        "ci95_high": 0.08663529440033828
+      },
+      "id_catastrophe": {
+        "n": 150,
+        "mean": 0.004888888888888889,
+        "sd": 0.012742307218038516,
+        "ci95_low": 0.0028496950346636987,
+        "ci95_high": 0.006928082743114079
+      },
+      "ood_reward": {
+        "n": 75,
+        "mean": -0.6406666666666668,
+        "sd": 2.946237790321263,
+        "ci95_low": -1.3074630497514095,
+        "ci95_high": 0.02612971641807582
+      },
+      "ood_progress": {
+        "n": 75,
+        "mean": -0.015,
+        "sd": 0.052733553859973276,
+        "ci95_low": -0.026934726754421427,
+        "ci95_high": -0.00306527324557857
+      }
+    },
+    "trace_reactive": {
+      "id_reward": {
+        "n": 150,
+        "mean": -1.122999999999999,
+        "sd": 4.855619729037693,
+        "ci95_low": -1.900060993780719,
+        "ci95_high": -0.3459390062192794
+      },
+      "id_progress": {
+        "n": 150,
+        "mean": -0.02261904761904762,
+        "sd": 0.08362103921462244,
+        "ci95_low": -0.03600120097107067,
+        "ci95_high": -0.009236894267024565
+      },
+      "id_intervention_cost": {
+        "n": 150,
+        "mean": 0.04933333333333333,
+        "sd": 0.057048980093897514,
+        "ci95_low": 0.040203595083685414,
+        "ci95_high": 0.05846307158298125
+      },
+      "id_catastrophe": {
+        "n": 150,
+        "mean": 0.001888888888888889,
+        "sd": 0.006558594576113128,
+        "ci95_low": 0.0008392951596597395,
+        "ci95_high": 0.0029384826181180386
+      },
+      "ood_reward": {
+        "n": 75,
+        "mean": -0.0373333333333333,
+        "sd": 0.2342459629773182,
+        "ci95_low": -0.0903481854876961,
+        "ci95_high": 0.0156815188210295
+      },
+      "ood_progress": {
+        "n": 75,
+        "mean": 0.0,
+        "sd": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.0
+      }
+    },
+    "behavior_tree": {
+      "id_reward": {
+        "n": 150,
+        "mean": -1.0296666666666658,
+        "sd": 5.078798861415985,
+        "ci95_low": -1.8424437601575585,
+        "ci95_high": -0.21688957317577306
+      },
+      "id_progress": {
+        "n": 150,
+        "mean": -0.02238095238095238,
+        "sd": 0.08773062497007818,
+        "ci95_low": -0.03642077642577378,
+        "ci95_high": -0.008341128336130982
+      },
+      "id_intervention_cost": {
+        "n": 150,
+        "mean": 0.038,
+        "sd": 0.06149152830830663,
+        "ci95_low": 0.028159305966528443,
+        "ci95_high": 0.047840694033471555
+      },
+      "id_catastrophe": {
+        "n": 150,
+        "mean": -0.00011111111111111136,
+        "sd": 0.00830457378867714,
+        "ci95_low": -0.001440119707596423,
+        "ci95_high": 0.0012178974853742004
+      },
+      "ood_reward": {
+        "n": 75,
+        "mean": -0.04333333333333329,
+        "sd": 0.2389918766760014,
+        "ci95_low": -0.0974222868718784,
+        "ci95_high": 0.01075562020521182
+      },
+      "ood_progress": {
+        "n": 75,
+        "mean": 0.0,
+        "sd": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.0
+      }
+    },
+    "plan_monitor_repair": {
+      "id_reward": {
+        "n": 150,
+        "mean": 2.3279999999999976,
+        "sd": 10.904346510396296,
+        "ci95_low": 0.5829411179740054,
+        "ci95_high": 4.07305888202599
+      },
+      "id_progress": {
+        "n": 150,
+        "mean": 0.04285714285714286,
+        "sd": 0.09168632770104335,
+        "ci95_low": 0.02818427453234155,
+        "ci95_high": 0.05753001118194416
+      },
+      "id_intervention_cost": {
+        "n": 150,
+        "mean": -0.13540000000000002,
+        "sd": 0.23408433631934278,
+        "ci95_low": -0.17286129580968196,
+        "ci95_high": -0.09793870419031808
+      },
+      "id_catastrophe": {
+        "n": 150,
+        "mean": -0.00011111111111111136,
+        "sd": 0.013307674789468746,
+        "ci95_low": -0.0022407826203881794,
+        "ci95_high": 0.0020185603981659568
+      },
+      "ood_reward": {
+        "n": 75,
+        "mean": -0.785333333333334,
+        "sd": 10.247091786945704,
+        "ci95_low": -3.1044685243620647,
+        "ci95_high": 1.533801857695397
+      },
+      "ood_progress": {
+        "n": 75,
+        "mean": 0.02875,
+        "sd": 0.09100137361600648,
+        "ci95_low": 0.008154450318899803,
+        "ci95_high": 0.0493455496811002
+      }
+    },
+    "simplex_representative": {
+      "id_reward": {
+        "n": 150,
+        "mean": -6.885999999999976,
+        "sd": 15.050423214188172,
+        "ci95_low": -9.294569342796361,
+        "ci95_high": -4.477430657203592
+      },
+      "id_progress": {
+        "n": 150,
+        "mean": -0.058095238095238096,
+        "sd": 0.21406774895204592,
+        "ci95_low": -0.0923532127760612,
+        "ci95_high": -0.023837263414414993
+      },
+      "id_intervention_cost": {
+        "n": 150,
+        "mean": -0.9528000000000005,
+        "sd": 0.4264983378804252,
+        "ci95_low": -1.0210539491915427,
+        "ci95_high": -0.8845460508084584
+      },
+      "id_catastrophe": {
+        "n": 150,
+        "mean": 0.06411111111111112,
+        "sd": 0.027084028844393652,
+        "ci95_low": 0.059776763789068835,
+        "ci95_high": 0.0684454584331534
+      },
+      "ood_reward": {
+        "n": 75,
+        "mean": -8.423999999999994,
+        "sd": 20.62962537816048,
+        "ci95_low": -13.092923748021931,
+        "ci95_high": -3.755076251978056
+      },
+      "ood_progress": {
+        "n": 75,
+        "mean": 0.05625,
+        "sd": 0.24509547229710413,
+        "ci95_low": 0.0007796727321065303,
+        "ci95_high": 0.11172032726789347
+      }
+    },
+    "option_switch": {
+      "id_reward": {
+        "n": 150,
+        "mean": -1.672166666666665,
+        "sd": 6.859342779107739,
+        "ci95_low": -2.769890132271005,
+        "ci95_high": -0.574443201062325
+      },
+      "id_progress": {
+        "n": 150,
+        "mean": -0.03119047619047619,
+        "sd": 0.0979428758074128,
+        "ci95_low": -0.04686460074218055,
+        "ci95_high": -0.015516351638771825
+      },
+      "id_intervention_cost": {
+        "n": 150,
+        "mean": 0.013,
+        "sd": 0.11088872226169899,
+        "ci95_low": -0.004745891467663804,
+        "ci95_high": 0.0307458914676638
+      },
+      "id_catastrophe": {
+        "n": 150,
+        "mean": 0.004666666666666667,
+        "sd": 0.009483295097488019,
+        "ci95_low": 0.003149023374153251,
+        "ci95_high": 0.006184309959180083
+      },
+      "ood_reward": {
+        "n": 75,
+        "mean": -0.37399999999999944,
+        "sd": 4.641523515026129,
+        "ci95_low": -1.424475661533322,
+        "ci95_high": 0.6764756615333232
+      },
+      "ood_progress": {
+        "n": 75,
+        "mean": -0.0033333333333333335,
+        "sd": 0.028867513459481287,
+        "ci95_low": -0.009866666666666666,
+        "ci95_high": 0.0031999999999999993
+      }
+    },
+    "validity_aware_prototype": {
+      "id_reward": {
+        "n": 0
+      },
+      "id_progress": {
+        "n": 0
+      },
+      "id_intervention_cost": {
+        "n": 0
+      },
+      "id_catastrophe": {
+        "n": 0
+      },
+      "ood_reward": {
+        "n": 0
+      },
+      "ood_progress": {
+        "n": 0
+      }
+    },
+    "triggered_replan": {
+      "id_reward": {
+        "n": 0
+      },
+      "id_progress": {
+        "n": 0
+      },
+      "id_intervention_cost": {
+        "n": 0
+      },
+      "id_catastrophe": {
+        "n": 0
+      },
+      "ood_reward": {
+        "n": 0
+      },
+      "ood_progress": {
+        "n": 0
+      }
+    },
+    "replan": {
+      "id_reward": {
+        "n": 0
+      },
+      "id_progress": {
+        "n": 0
+      },
+      "id_intervention_cost": {
+        "n": 0
+      },
+      "id_catastrophe": {
+        "n": 0
+      },
+      "ood_reward": {
+        "n": 0
+      },
+      "ood_progress": {
+        "n": 0
+      }
+    }
+  }
+}
