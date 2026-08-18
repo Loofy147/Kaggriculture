@@ -67,6 +67,33 @@ class TestMainAgent(unittest.TestCase):
         modified = main._pre_production_animal_harvest(action, obs)
         self.assertEqual(modified["farmer"], ["HARVEST"])
 
+    def test_market_controller_calculated_fields(self):
+        """Verify calculated field functions for market order management."""
+        obs = {
+            "player": 0,
+            "farms": [{"money": 500, "tiles": []}, {"money": 500, "tiles": []}],
+            "private": {"shed": {"MELON": 2, "WOOL": 1}, "inventories": []},
+            "market": {"inventory": {"MELON": 10000, "WOOL": 10000}, "prices": {"MELON": 250, "WOOL": 200}},
+            "town": {"unlocked_shops": ["BAKERY"]},
+        }
+
+        # Test cash needed calculation for seed and animal buys
+        orders = [["BUY_SEED", "WHEAT", 2], ["BUY_ANIMAL", "COW", 1]]
+        needed = main._cash_needed(orders, obs)
+        self.assertEqual(needed, 2 * 10 + 400)
+
+        # Test sell order priority calculation
+        order_melon = ["SELL", "MELON", 2]
+        order_wool = ["SELL", "WOOL", 1]
+        p_melon = main._sell_priority(order_melon, obs, step=100)
+        p_wool = main._sell_priority(order_wool, obs, step=100)
+        self.assertIsInstance(p_melon, float)
+        self.assertIsInstance(p_wool, float)
+
+        # Test reserve price calculation with market/town drain
+        r_melon = main._reserve_price("MELON", step=100, obs=obs, shops=["BAKERY"])
+        self.assertGreater(r_melon, 0)
+
     def test_local_game_execution(self):
         """Run a short local game episode to ensure no exceptions or crashes."""
         env = make("kaggriculture", configuration={"episodeSteps": 48})
