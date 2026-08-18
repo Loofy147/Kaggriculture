@@ -956,3 +956,26 @@ def agent(obs, config=None):
 # execution select the same policy.
 def kaggle_submission_agent(obs, config=None):
     return agent(obs, config)
+
+# ===========================================================================
+# Hybrid Controller Integration
+# ===========================================================================
+from hybrid_controller import DynamicActionMasker, MacroTemporalController, StateTriggeredFallback
+
+_hybrid_macro = MacroTemporalController()
+_final_pipeline_host_agent = agent
+
+
+def agent(obs, config=None):
+    raw_action = _final_pipeline_host_agent(obs, config)
+    try:
+        step = int(obs.get("step", 0) or 0)
+        _hybrid_macro.evaluate_macro_state(obs, step)
+        masked = DynamicActionMasker.mask_action(raw_action, obs)
+        return StateTriggeredFallback.audit_and_fallback(masked, raw_action, confidence_score=1.0)
+    except Exception:
+        return raw_action
+
+
+def kaggle_submission_agent(obs, config=None):
+    return agent(obs, config)

@@ -1,6 +1,7 @@
 import unittest
 from kaggle_environments import make
 import main
+import hybrid_controller
 
 
 class TestMainAgent(unittest.TestCase):
@@ -67,32 +68,47 @@ class TestMainAgent(unittest.TestCase):
         modified = main._pre_production_animal_harvest(action, obs)
         self.assertEqual(modified["farmer"], ["HARVEST"])
 
-    def test_market_controller_calculated_fields(self):
-        """Verify calculated field functions for market order management."""
+    def test_hybrid_controller_modules(self):
+        """Verify hybrid_controller pre-computation, action masking, macro controller, and fallbacks."""
         obs = {
             "player": 0,
-            "farms": [{"money": 500, "tiles": []}, {"money": 500, "tiles": []}],
-            "private": {"shed": {"MELON": 2, "WOOL": 1}, "inventories": []},
-            "market": {"inventory": {"MELON": 10000, "WOOL": 10000}, "prices": {"MELON": 250, "WOOL": 200}},
-            "town": {"unlocked_shops": ["BAKERY"]},
+            "farms": [
+                {
+                    "money": 30,  # low money
+                    "tiles": [[{"kind": "PASTURE", "animal": "COW"}]],
+                },
+                {"money": 500, "tiles": []},
+            ],
+            "private": {
+                "shed": {"WHEAT": 5},  # 1 animal -> wheat reserve = 2*1+5 = 7 wheat (only 5 in shed, so 0 wheat sellable)
+                "inventories": [],
+            },
+            "market": {"prices": {"WHEAT": 25, "COW": 400}},
         }
 
-        # Test cash needed calculation for seed and animal buys
-        orders = [["BUY_SEED", "WHEAT", 2], ["BUY_ANIMAL", "COW", 1]]
-        needed = main._cash_needed(orders, obs)
-        self.assertEqual(needed, 2 * 10 + 400)
+        # Calculated field engine
+        needed = hybrid_controller.CalculatedFieldEngine.calculate_cash_needed([["BUY_ANIMAL", "COW", 1]], obs)
+        self.assertEqual(needed, 400)
 
-        # Test sell order priority calculation
-        order_melon = ["SELL", "MELON", 2]
-        order_wool = ["SELL", "WOOL", 1]
-        p_melon = main._sell_priority(order_melon, obs, step=100)
-        p_wool = main._sell_priority(order_wool, obs, step=100)
-        self.assertIsInstance(p_melon, float)
-        self.assertIsInstance(p_wool, float)
+        # Dynamic action masker: masks out unaffordable COW buy ($400 > $30) and wheat sell (holding 5 <= reserve 7)
+        proposed_action = {
+            "farmer": ["PASS"],
+            "hands": [],
+            "market": [["BUY_ANIMAL", "COW", 1], ["SELL", "WHEAT", 5]],
+        }
+        masked = hybrid_controller.DynamicActionMasker.mask_action(proposed_action, obs)
+        self.assertEqual(masked["market"], [])
 
-        # Test reserve price calculation with market/town drain
-        r_melon = main._reserve_price("MELON", step=100, obs=obs, shops=["BAKERY"])
-        self.assertGreater(r_melon, 0)
+        # Macro controller: evaluate parameter shifts
+        macro = hybrid_controller.MacroTemporalController()
+        macro.evaluate_macro_state(obs, step=700)
+        self.assertEqual(macro.early_terminal, 716)
+
+        # Fallback monitor
+        fallback_action = hybrid_controller.StateTriggeredFallback.audit_and_fallback(
+            masked, proposed_action, confidence_score=0.2
+        )
+        self.assertEqual(fallback_action, proposed_action)
 
     def test_local_game_execution(self):
         """Run a short local game episode to ensure no exceptions or crashes."""
