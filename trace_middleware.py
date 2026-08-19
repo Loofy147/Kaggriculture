@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+import dataclasses
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional, Sequence, Tuple
@@ -9,6 +10,34 @@ import logging
 
 Action = Dict[str, Any]
 Observation = Dict[str, Any]
+
+
+# Fast object copying routine to bypass copy.deepcopy overhead in hot step loops
+def _fast_copy(obj: Any) -> Any:
+    """Fast copy routine for actions, observations, feedback, and proposals.
+
+    Replaces copy.deepcopy by performing targeted shallow copies on dicts,
+    lists, and dataclasses, avoiding general object graph inspection while
+    preserving strict state isolation.
+    """
+    if obj is None:
+        return None
+    if isinstance(obj, dict):
+        res = obj.copy()
+        for k, v in res.items():
+            if isinstance(v, (dict, list)):
+                res[k] = _fast_copy(v)
+        return res
+    if isinstance(obj, list):
+        return [_fast_copy(x) for x in obj]
+    if dataclasses.is_dataclass(obj):
+        changes = {}
+        for f in dataclasses.fields(obj):
+            v = getattr(obj, f.name)
+            if isinstance(v, (dict, list)):
+                changes[f.name] = _fast_copy(v)
+        return dataclasses.replace(obj, **changes) if changes else copy.copy(obj)
+    return copy.deepcopy(obj)
 
 
 class ProposalKind(str, Enum):
@@ -62,9 +91,9 @@ class TracePolicy(BasePolicy):
     def propose(self, obs: Observation, memory: AgentMemory) -> Intent:
         step = memory.step
         if 0 <= step < len(self.trace):
-            return Intent(copy.deepcopy(self.trace[step]), "trace", step)
+            return Intent(_fast_copy(self.trace[step]), "trace", step)
         if self.fallback is not None:
-            return Intent(copy.deepcopy(self.fallback(obs, memory)), "fallback", step)
+            return Intent(_fast_copy(self.fallback(obs, memory)), "fallback", step)
         return Intent({"action": "PASS"}, "safe_fallback", step)
 
 
@@ -130,7 +159,7 @@ class PriorityArbiter(Arbiter):
         proposals = list(context.proposals)
         if not proposals:
             return ArbitrationResult(
-                action=copy.deepcopy(context.intent.action),
+                action=_fast_copy(context.intent.action),
                 winning_source=context.intent.source,
                 rationale="No overlay intervened; baseline intent preserved.",
             )
@@ -143,14 +172,14 @@ class PriorityArbiter(Arbiter):
 
         if winner.action is None:
             return ArbitrationResult(
-                action=copy.deepcopy(context.intent.action),
+                action=_fast_copy(context.intent.action),
                 winning_source=context.intent.source,
                 rejected_proposals=[p.overlay for p in ranked],
                 rationale=f"Top proposal '{winner.overlay}' had no executable action.",
             )
 
         return ArbitrationResult(
-            action=copy.deepcopy(winner.action),
+            action=_fast_copy(winner.action),
             winning_source=winner.overlay,
             applied_proposals=[winner.overlay],
             rejected_proposals=[p.overlay for p in ranked[1:]],
@@ -167,7 +196,7 @@ class ExecutionRecovery(ABC):
 class DefaultExecutionRecovery(ExecutionRecovery):
     def recover(self, feedback: ExecutionFeedback, memory: AgentMemory) -> None:
         if feedback.remainder is not None:
-            memory.pending_actions.append(copy.deepcopy(feedback.remainder))
+            memory.pending_actions.append(_fast_copy(feedback.remainder))
 
 
 class CollisionRepairOverlay(BaseOverlay):
@@ -185,7 +214,7 @@ class CollisionRepairOverlay(BaseOverlay):
             priority=self.priority,
             confidence=1.0,
             rationale="Baseline action conflicts with a hard environment constraint.",
-            metadata={"reason": "blocked", "original_action": copy.deepcopy(intent.action)},
+            metadata={"reason": "blocked", "original_action": _fast_copy(intent.action)},
         )
 
 
@@ -203,7 +232,7 @@ class AnticipatoryResourceOverlay(BaseOverlay):
         return OverlayProposal(
             overlay=self.name,
             kind=ProposalKind.MODIFY,
-            action=copy.deepcopy(future_actions[0]),
+            action=_fast_copy(future_actions[0]),
             priority=self.priority,
             confidence=max(0.0, min(1.0, float(obs.get("resource_prediction_confidence", 0.5)))),
             rationale="Predicted resource contention warrants pre-positioning.",
@@ -223,7 +252,7 @@ class AdversarialPressureOverlay(BaseOverlay):
         return OverlayProposal(
             overlay=self.name,
             kind=ProposalKind.MODIFY,
-            action=copy.deepcopy(pressure_action),
+            action=_fast_copy(pressure_action),
             priority=self.priority,
             confidence=max(0.0, min(1.0, vulnerability)),
             rationale="Observable opponent vulnerability creates a pressure opportunity.",
@@ -261,13 +290,13 @@ class ReactivePipeline:
             self.memory.step += 1
 
         if feedback is not None:
-            self.memory.last_feedback = copy.deepcopy(feedback)
+            self.memory.last_feedback = _fast_copy(feedback)
             self.recovery.recover(feedback, self.memory)
 
         self.memory.history.append({
             "step": self.memory.step,
-            "observation": copy.deepcopy(obs),
-            "feedback": copy.deepcopy(feedback),
+            "observation": _fast_copy(obs),
+            "feedback": _fast_copy(feedback),
         })
         if len(self.memory.history) > self.history_limit:
             del self.memory.history[:-self.history_limit]
@@ -282,20 +311,20 @@ class ReactivePipeline:
                 # intent so even accidental in-place mutation cannot corrupt
                 # the canonical baseline intent or another overlay's view.
                 isolated_intent = Intent(
-                    action=copy.deepcopy(intent.action),
+                    action=_fast_copy(intent.action),
                     source=intent.source,
                     step=intent.step,
                 )
                 proposal = overlay.propose(obs, isolated_intent, self.memory)
                 if proposal is not None:
-                    proposals.append(copy.deepcopy(proposal))
+                    proposals.append(_fast_copy(proposal))
             except Exception as exc:
                 self.logger.exception("Overlay '%s' failed at step %s: %s", overlay.name, self.memory.step, exc)
         context = DecisionContext(obs=obs, intent=intent, proposals=tuple(proposals), memory=self.memory)
         return self.arbiter.resolve(context)
 
     def act(self, obs: Observation, feedback: Optional[ExecutionFeedback] = None) -> Action:
-        return copy.deepcopy(self.decide(obs, feedback).action)
+        return _fast_copy(self.decide(obs, feedback).action)
 
 
 def create_agent(trace_data: Sequence[Action]) -> ReactivePipeline:
