@@ -253,11 +253,11 @@ _I0 = 10000
 _PRICE_FLOOR = 1
 _MP = {
     "WHEAT": (25, 400, "sqrt", 0.80, "log", 0.20),
-    "CARROT": (35, 450, "log", 0.20, "sqrt", 0.70),
-    "TOMATO": (60, 200, "linear", 0.40, "sqrt", 0.60),
+    "CARROT": (35, 450, "hinge", 1.00, "sqrt", 0.70),
+    "TOMATO": (60, 200, "hinge", 0.40, "sqrt", 0.60),
     "STRAWBERRY": (120, 100, "sqrt", 0.70, "linear", 1.60),
     "MELON": (250, 300, "log", 0.20, "sq", 3.60),
-    "EGG": (50, 332, "linear", 0.40, "log", 0.20),
+    "EGG": (50, 332, "hinge", 0.40, "log", 0.20),
     "MILK": (160, 122, "sqrt", 0.60, "linear", 1.60),
     "WOOL": (200, 105, "log", 0.20, "sq", 3.20),
     "FERTILIZER": (100, 200, "linear", 0.40, "linear", 0.40),
@@ -336,7 +336,8 @@ _SUPPLY_DRIVER = {
 }
 
 
-def _mshape(func, x):
+def _mshape(func, x, T=None):
+    x = max(0.0, x)
     if func == "linear":
         return x
     if func == "sq":
@@ -345,6 +346,11 @@ def _mshape(func, x):
         return _math.sqrt(x)
     if func == "log10":
         return _math.log10(1.0 + x)
+    if func == "hinge":
+        if not T or T <= 0:
+            return x
+        u = x / T
+        return u + 8.0 * max(0.0, u - 1.0) ** 2
     return _math.log(1.0 + x)
 
 
@@ -352,11 +358,11 @@ def _mprice(item, inventory):
     """Exact port of the engine's market_price."""
     base, throughput, below_f, below_t, above_f, above_t = _MP[item]
     if inventory < _I0:
-        amp = below_t * base / _mshape(below_f, throughput)
-        value = base + amp * _mshape(below_f, _I0 - inventory)
+        amp = below_t * base / _mshape(below_f, throughput, throughput)
+        value = base + amp * _mshape(below_f, _I0 - inventory, throughput)
     else:
-        amp = above_t * base / _mshape(above_f, throughput)
-        value = base - amp * _mshape(above_f, inventory - _I0)
+        amp = above_t * base / _mshape(above_f, throughput, throughput)
+        value = base - amp * _mshape(above_f, inventory - _I0, throughput)
     return max(_PRICE_FLOOR, int(round(value)))
 
 
