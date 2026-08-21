@@ -452,3 +452,484 @@ class EconomicPlanner:
             ))
             candidates.append(self.sale_action(product, qty, expected_price=current))
         return sorted(candidates, key=lambda a: a.score, reverse=True)
+
+
+class SpatialScheduler:
+    """
+    Multi-unit task routing and pathfinding engine.
+
+    Responsibilities:
+      - Scan farm state for task priorities.
+      - Self-calibrate direction mappings (NORTH, SOUTH, EAST, WEST) based on movement observations.
+      - Assign units (farmer + hands) using prioritized spatial assignment.
+      - Route units towards shed access tiles when EOD or inventory demands.
+    """
+
+    DIRS = ("NORTH", "SOUTH", "EAST", "WEST")
+
+    def __init__(self) -> None:
+        self.dir_delta: Dict[str, Tuple[int, int]] = {
+            "NORTH": (0, -1),
+            "SOUTH": (0, 1),
+            "EAST": (1, 0),
+            "WEST": (-1, 0),
+        }
+        self.dir_calibrated: Dict[str, bool] = {d: False for d in self.DIRS}
+        self.last_pos: Dict[str, Tuple[int, int]] = {}
+        self.last_dir: Dict[str, Optional[str]] = {}
+
+    def calibrate_direction(self, unit_id: str, cur_pos: Tuple[int, int]) -> None:
+        prev_dir = self.last_dir.get(unit_id)
+        prev_pos = self.last_pos.get(unit_id)
+        if prev_dir is None or prev_pos is None:
+            return
+        dx = cur_pos[0] - prev_pos[0]
+        dy = cur_pos[1] - prev_pos[1]
+        if abs(dx) + abs(dy) != 1:
+            return
+        observed = (dx, dy)
+        if observed != self.dir_delta.get(prev_dir):
+            self.dir_delta[prev_dir] = observed
+            self.dir_calibrated[prev_dir] = True
+
+    def step_toward(self, cur: Tuple[int, int], target: Tuple[int, int]) -> Optional[str]:
+        cx, cy = cur
+        tx, ty = target
+        dx, dy = tx - cx, ty - cy
+        if dx == 0 and dy == 0:
+            return None
+        candidates = []
+        if dx != 0:
+            candidates.append(("EAST" if dx > 0 else "WEST", abs(dx)))
+        if dy != 0:
+            candidates.append(("SOUTH" if dy > 0 else "NORTH", abs(dy)))
+        candidates.sort(key=lambda t: -t[1])
+        wanted_name = candidates[0][0]
+        wanted_delta = {"EAST": (1, 0), "WEST": (-1, 0), "SOUTH": (0, 1), "NORTH": (0, -1)}[wanted_name]
+        for name, delta in self.dir_delta.items():
+            if delta == wanted_delta:
+                return name
+        return wanted_name
+
+    @staticmethod
+    def _manhattan(a: Tuple[int, int], b: Tuple[int, int]) -> int:
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+    @staticmethod
+    def _quadrant_of(x: int, y: int, half: int) -> str:
+        if x < half and y < half:
+            return "NW"
+        if x >= half and y < half:
+            return "NE"
+        if x < half and y >= half:
+            return "SW"
+        return "SE"
+
+    @staticmethod
+    def shed_tiles(board_size: int = 10) -> List[Tuple[int, int]]:
+        half = board_size // 2
+        return [(half - 1, half - 1), (half, half - 1), (half - 1, half), (half, half)]
+
+    def scan_farm(
+        self,
+        tiles: List[List[Any]],
+        day: int,
+        unlocked_quadrants: List[str],
+        board_size: int = 10,
+    ) -> Dict[str, Any]:
+        half = board_size // 2
+        shed_set = set(self.shed_tiles(board_size))
+        unlocked_set = set(unlocked_quadrants)
+
+        needs_water: List[Tuple[int, int]] = []
+        harvest_ready: List[Tuple[int, int, str]] = []
+        weeds: List[Tuple[int, int]] = []
+        empty_tiles: List[Tuple[int, int]] = []
+        needs_fertilize: List[Tuple[int, int, str]] = []
+        empty_structures: List[Tuple[int, int, str]] = []
+        animal_needs_feed: List[Tuple[int, int]] = []
+        animal_needs_care: List[Tuple[int, int]] = []
+        animal_fert_ready: List[Tuple[int, int]] = []
+        animal_ready_harvest: List[Tuple[int, int]] = []
+        crop_counts = {c: 0 for c in CROPS}
+
+        for y in range(len(tiles)):
+            for x in range(len(tiles[y])):
+                if self._quadrant_of(x, y, half) not in unlocked_set:
+                    continue
+                tile = tiles[y][x]
+                if tile is None:
+                    if (x, y) not in shed_set:
+                        empty_tiles.append((x, y))
+                    continue
+                if tile == "LOCKED":
+                    continue
+                kind = tile.get("kind") if isinstance(tile, dict) else None
+                if kind == "WEED":
+                    weeds.append((x, y))
+                elif kind == "PLANT":
+                    crop = str(tile.get("crop"))
+                    if crop in crop_counts:
+                        crop_counts[crop] += 1
+                    planted_day = int(tile.get("planted_day", day))
+                    age = day - planted_day
+                    crop_info = CROPS.get(crop, {})
+                    first_yield = crop_info.get("first_yield_day", 2)
+                    max_yield_day = crop_info.get("max_yield_day", 4)
+
+                    if not tile.get("watered_today", False):
+                        needs_water.append((x, y))
+                    if age >= first_yield and (tile.get("yield_units", 0) > 0 or age >= max_yield_day):
+                        harvest_ready.append((x, y, crop))
+                    elif (
+                        crop in ("MELON", "TOMATO", "STRAWBERRY", "CARROT")
+                        and tile.get("fertilized_until_day", -1) < day
+                        and age < max_yield_day
+                    ):
+                        needs_fertilize.append((x, y, crop))
+                elif kind in ("COOP", "PASTURE"):
+                    if tile.get("animal") is None:
+                        empty_structures.append((x, y, str(kind)))
+                    else:
+                        if not tile.get("fed_today", False):
+                            animal_needs_feed.append((x, y))
+                        elif not tile.get("cared_today", False):
+                            animal_needs_care.append((x, y))
+                        if tile.get("fertilizer_available", False):
+                            animal_fert_ready.append((x, y))
+                        if tile.get("yield_units", 0) > 0:
+                            animal_ready_harvest.append((x, y))
+
+        return dict(
+            needs_water=needs_water,
+            harvest_ready=harvest_ready,
+            weeds=weeds,
+            empty_tiles=empty_tiles,
+            needs_fertilize=needs_fertilize,
+            empty_structures=empty_structures,
+            animal_needs_feed=animal_needs_feed,
+            animal_needs_care=animal_needs_care,
+            animal_fert_ready=animal_fert_ready,
+            animal_ready_harvest=animal_ready_harvest,
+            crop_counts=crop_counts,
+        )
+
+    def schedule(
+        self,
+        truth_state: TruthState,
+        tasks: Dict[str, Any],
+        inventories: Optional[List[Dict[str, int]]] = None,
+    ) -> Dict[str, List[Any]]:
+        """
+        Assigns actions for 'farmer' and each 'handX'.
+        """
+        units: List[Tuple[str, Tuple[int, int]]] = [("farmer", truth_state.farmer)]
+        for i, hpos in enumerate(truth_state.hands):
+            units.append((f"hand{i}", hpos))
+
+        for uid, pos in units:
+            self.calibrate_direction(uid, pos)
+
+        ops: Dict[str, List[Any]] = {}
+        claimed: set = set()
+
+        seeds_left = dict(truth_state.seeds)
+        shed = dict(truth_state.shed)
+        money = truth_state.cash
+        invs = inventories or [{}] * len(units)
+
+        def claim_nearest(pos_list: List[Tuple[int, int]], unit_pos: Tuple[int, int]) -> Optional[Tuple[int, int]]:
+            avail = [p for p in pos_list if p not in claimed]
+            if not avail:
+                return None
+            best = min(avail, key=lambda p: (self._manhattan(unit_pos, p), p[1], p[0]))
+            claimed.add(best)
+            return best
+
+        s_tiles = self.shed_tiles(TruthLayer.BOARD_SIZE)
+
+        for unit_idx, (unit_id, pos) in enumerate(units):
+            assigned = False
+            u_inv = invs[unit_idx] if unit_idx < len(invs) else {}
+
+            # 1. Animal Feed
+            feed_target = claim_nearest(tasks["animal_needs_feed"], pos)
+            if feed_target is not None:
+                if u_inv.get("WHEAT", 0) > 0:
+                    if pos == feed_target:
+                        ops[unit_id] = ["FEED"]
+                        u_inv["WHEAT"] -= 1
+                    else:
+                        dir_cmd = self.step_toward(pos, feed_target)
+                        ops[unit_id] = [dir_cmd] if dir_cmd else ["PASS"]
+                    assigned = True
+                else:
+                    claimed.remove(feed_target)
+                    if shed.get("WHEAT", 0) > 0:
+                        if pos in s_tiles:
+                            qty = min(5, shed["WHEAT"])
+                            ops[unit_id] = ["PICKUP", "WHEAT", qty]
+                            shed["WHEAT"] -= qty
+                            assigned = True
+                        else:
+                            target_s = min(s_tiles, key=lambda s: self._manhattan(pos, s))
+                            dir_cmd = self.step_toward(pos, target_s)
+                            ops[unit_id] = [dir_cmd] if dir_cmd else ["PASS"]
+                            assigned = True
+
+            if assigned:
+                continue
+
+            # 2. Water plants
+            water_target = claim_nearest(tasks["needs_water"], pos)
+            if water_target is not None:
+                if pos == water_target:
+                    ops[unit_id] = ["WATER"]
+                else:
+                    dir_cmd = self.step_toward(pos, water_target)
+                    ops[unit_id] = [dir_cmd] if dir_cmd else ["PASS"]
+                assigned = True
+
+            if assigned:
+                continue
+
+            # 3. Harvest crops / animal products
+            crop_targets = [(x, y) for (x, y, _c) in tasks["harvest_ready"]]
+            h_target = claim_nearest(crop_targets, pos)
+            if h_target is None:
+                h_target = claim_nearest(tasks["animal_ready_harvest"], pos)
+            if h_target is not None:
+                if pos == h_target:
+                    ops[unit_id] = ["HARVEST"]
+                else:
+                    dir_cmd = self.step_toward(pos, h_target)
+                    ops[unit_id] = [dir_cmd] if dir_cmd else ["PASS"]
+                assigned = True
+
+            if assigned:
+                continue
+
+            # 4. Weeds
+            weed_target = claim_nearest(tasks["weeds"], pos)
+            if weed_target is not None:
+                if pos == weed_target:
+                    ops[unit_id] = ["DIG"]
+                else:
+                    dir_cmd = self.step_toward(pos, weed_target)
+                    ops[unit_id] = [dir_cmd] if dir_cmd else ["PASS"]
+                assigned = True
+
+            if assigned:
+                continue
+
+            # 5. Plant crops if seed available
+            if tasks["empty_tiles"]:
+                avail_crops = [c for c, count in seeds_left.items() if count > 0]
+                if avail_crops:
+                    crop_to_plant = avail_crops[0]
+                    p_target = claim_nearest(tasks["empty_tiles"], pos)
+                    if p_target is not None:
+                        if pos == p_target:
+                            ops[unit_id] = ["PLANT", crop_to_plant]
+                            seeds_left[crop_to_plant] -= 1
+                        else:
+                            dir_cmd = self.step_toward(pos, p_target)
+                            ops[unit_id] = [dir_cmd] if dir_cmd else ["PASS"]
+                        assigned = True
+
+            if assigned:
+                continue
+
+            # 6. EOD Return to shed or PASS
+            if truth_state.hour >= 20:
+                if pos not in s_tiles:
+                    target_s = min(s_tiles, key=lambda s: self._manhattan(pos, s))
+                    dir_cmd = self.step_toward(pos, target_s)
+                    ops[unit_id] = [dir_cmd] if dir_cmd else ["PASS"]
+                    assigned = True
+
+            if not assigned:
+                ops[unit_id] = ["PASS"]
+
+            # Record last positions and directions for calibration
+            op = ops[unit_id]
+            self.last_pos[unit_id] = pos
+            self.last_dir[unit_id] = op[0] if op and op[0] in self.DIRS else None
+
+        return ops
+
+
+class OpponentPolicyModel:
+    """
+    Tracks opponent observed state across turns and updates opponent beliefs.
+    """
+    def __init__(self) -> None:
+        self.prev_opponent_plants: Dict[Tuple[int, int], PlantTruth] = {}
+        self.watered_count: int = 0
+        self.total_observed: int = 0
+
+    def update(self, current_opponent_plants: List[PlantTruth]) -> OpponentBelief:
+        current_dict = {(p.x, p.y): p for p in current_opponent_plants}
+        for pos, plant in current_dict.items():
+            if pos in self.prev_opponent_plants:
+                self.total_observed += 1
+                if plant.watered_today:
+                    self.watered_count += 1
+        self.prev_opponent_plants = current_dict
+
+        if self.total_observed == 0:
+            return OpponentBelief()
+
+        water_ratio = self.watered_count / self.total_observed
+        reliable = max(0.1, min(0.95, water_ratio))
+        neglected = max(0.05, 1.0 - reliable)
+        return OpponentBelief(reliable_care=reliable, delayed_harvest=0.05, neglected=neglected).normalized()
+
+
+class ActionArbiter:
+    """
+    Final decision arbiter and action matrix builder.
+    Combines unit operations and market orders while enforcing engine invariants.
+    """
+    MAX_MARKET_ORDERS = 10
+
+    @staticmethod
+    def total_owned_animals(farm_tiles: List[List[Any]], shed: Dict[str, int]) -> int:
+        count = 0
+        for row in farm_tiles:
+            for tile in row:
+                if isinstance(tile, dict) and tile.get("kind") in ("COOP", "PASTURE"):
+                    if tile.get("animal") is not None:
+                        count += 1
+        for anim in ("GOOSE", "COW", "SHEEP"):
+            count += shed.get(anim, 0)
+        return count
+
+    def arbitrate(
+        self,
+        truth_state: TruthState,
+        unit_ops: Dict[str, List[Any]],
+        raw_market_orders: List[List[Any]],
+    ) -> Dict[str, Any]:
+        farmer_op = unit_ops.get("farmer", ["PASS"])
+        hand_ops = [unit_ops.get(f"hand{i}", ["PASS"]) for i in range(len(truth_state.hands))]
+
+        owned_animals = self.total_owned_animals(truth_state.farm_tiles, truth_state.shed)
+        min_wheat_reserve = owned_animals * 2 + 5
+
+        valid_market_orders = []
+        for order in raw_market_orders:
+            if not isinstance(order, (list, tuple)) or not order:
+                continue
+            op_type = order[0]
+            if op_type == "SELL" and len(order) >= 3 and order[1] == "WHEAT":
+                qty = int(order[2])
+                current_wheat = truth_state.shed.get("WHEAT", 0)
+                available = max(0, current_wheat - min_wheat_reserve)
+                if available <= 0:
+                    continue
+                qty = min(qty, available)
+                valid_market_orders.append(["SELL", "WHEAT", qty])
+            else:
+                valid_market_orders.append(list(order))
+
+        sliced_orders = valid_market_orders[:self.MAX_MARKET_ORDERS]
+
+        return {
+            "farmer": farmer_op,
+            "hands": hand_ops,
+            "market": sliced_orders,
+        }
+
+
+class KaggricultureSovereignNode:
+    """
+    Main global singleton node orchestrating Perception, Macro-Economics, Spatial Routing, and Safety Arbitration.
+    """
+
+    def __init__(self) -> None:
+        self.truth = TruthLayer()
+        self.estimator = WorldStateEstimator(self.truth)
+        self.planner = EconomicPlanner(self.truth, self.estimator)
+        self.scheduler = SpatialScheduler()
+        self.opp_model = OpponentPolicyModel()
+        self.arbiter = ActionArbiter()
+
+    def _generate_market_orders(self, truth_state: TruthState, tasks: Dict[str, Any]) -> List[List[Any]]:
+        orders = []
+        shed = truth_state.shed
+        prices = truth_state.market_prices
+        money = truth_state.cash
+
+        # 1. Sale candidates from EconomicPlanner
+        sale_candidates = self.planner.best_sale_candidates()
+        for cand in sale_candidates:
+            if cand.product and cand.quantity > 0:
+                orders.append(["SELL", cand.product, int(cand.quantity)])
+
+        # 2. Buy seeds if empty tiles exist and no seeds available
+        if tasks.get("empty_tiles"):
+            has_seeds = sum(truth_state.seeds.values()) > 0
+            if not has_seeds and money >= 10:
+                orders.append(["BUY_SEED", "WHEAT", 1])
+                money -= 10
+
+        # 3. Restock wheat for animals if needed
+        owned_animals = self.arbiter.total_owned_animals(truth_state.farm_tiles, shed)
+        if owned_animals > 0:
+            req_wheat = owned_animals * 2 + 5
+            curr_wheat = shed.get("WHEAT", 0)
+            if curr_wheat < req_wheat:
+                needed = req_wheat - curr_wheat
+                w_price = prices.get("WHEAT", 25)
+                if money >= needed * w_price + 150:
+                    orders.append(["BUY_PRODUCT", "WHEAT", needed])
+                    money -= needed * w_price
+
+        return orders
+
+    def act(self, obs: Mapping[str, Any]) -> Dict[str, Any]:
+        try:
+            truth_state = self.truth.update(obs)
+            self.opp_model.update(truth_state.opponent_plants)
+
+            unlocked = ["NW"]  # NW default, or read from obs
+            farms = obs.get("farms", [])
+            p_idx = int(obs.get("player", 0))
+            if p_idx < len(farms):
+                unlocked = farms[p_idx].get("unlocked_quadrants", ["NW"])
+
+            tasks = self.scheduler.scan_farm(
+                truth_state.farm_tiles,
+                truth_state.day,
+                unlocked,
+                TruthLayer.BOARD_SIZE,
+            )
+
+            inventories = (obs.get("private", {}) or {}).get("inventories", [])
+            unit_ops = self.scheduler.schedule(truth_state, tasks, inventories)
+            raw_market = self._generate_market_orders(truth_state, tasks)
+
+            return self.arbiter.arbitrate(truth_state, unit_ops, raw_market)
+        except Exception:
+            # Graceful degradation safe fallback
+            hands = []
+            farms = obs.get("farms", [])
+            p_idx = int(obs.get("player", 0))
+            if p_idx < len(farms):
+                hands = [["PASS"]] * len(farms[p_idx].get("hands", []))
+            return {
+                "farmer": ["PASS"],
+                "hands": hands,
+                "market": [],
+            }
+
+
+_SOVEREIGN_NODE = KaggricultureSovereignNode()
+
+
+def agent(obs: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Kaggle competition agent entry point.
+    """
+    return _SOVEREIGN_NODE.act(obs)
