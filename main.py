@@ -162,7 +162,10 @@ def _move_toward(pos, target, tiles):
 def _terminal_action(obs):
     """Observation-driven final-eight-turn harvest/drop/sell controller."""
     player = int(obs.get("player", 0) or 0)
-    farm = (obs.get("farms") or [])[player]
+    farms = obs.get("farms") or []
+    if not farms or player >= len(farms):
+        return {"farmer": ["PASS"], "hands": [], "market": []}
+    farm = farms[player]
     private = obs.get("private") or {}
     tiles = farm.get("tiles") or []
     size = len(tiles)
@@ -543,7 +546,9 @@ def _sell_priority(order, obs, step=0):
     inv = int(inventory.get(item, _I0) or _I0)
     unit = _mprice(item, inv)
     held = int(((obs.get("private") or {}).get("shed") or {}).get(item, 0) or 0)
-    qty = min(qty, held) if held > 0 else qty
+    qty = min(qty, max(0, held))
+    if qty <= 0:
+        return -1.0
     race = _race_factor(item, step, obs)
     if _SORT_KEY == "unit":
         return float(unit) * race
@@ -584,7 +589,7 @@ def _pre_production_animal_harvest(action, obs):
                             ops[actor] = ["HARVEST"]
 
         action["farmer"] = ops[0]
-        action["hands"] = ops[1:len(positions)]
+        action["hands"] = ops[1:]
     except Exception:
         pass
     return action
